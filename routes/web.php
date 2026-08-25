@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CritiqueController;
@@ -12,20 +13,25 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminCritiqueController;
 use App\Http\Controllers\Admin\AdminUserController;
 
-// Route publik, bisa diakses baik guest maupun user yang sudah login
-Route::get('/get-regencies', [RegisterController::class, 'getRegencies'])->name('get.regencies');
-Route::get('/get-districts', [RegisterController::class, 'getDistricts'])->name('get.districts');
-
+// ============ GUEST ROUTES ============
 Route::middleware('guest')->group(function () {
-    Route::get('/', function () {
-        return redirect()->route('login');
-    });
+    // Auth
+    Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
+    Route::get('/get-regencies', [RegisterController::class, 'getRegencies'])->name('get.regencies');
+    Route::get('/get-districts', [RegisterController::class, 'getDistricts'])->name('get.districts');
+
+    // ============ LUPA PASSWORD ============
+    Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
 });
 
+// ============ AUTH ROUTES ============
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
@@ -51,6 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get-districts-critique', [CritiqueController::class, 'getDistricts'])->name('get.districts.critique');
 });
 
+// ============ ADMIN ROUTES ============
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 

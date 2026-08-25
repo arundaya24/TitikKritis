@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Critique;
-use App\Models\CritiqueHistory;
-use App\Models\District;
+use App\Models\Category;
 use App\Models\Province;
 use App\Models\Regency;
+use App\Models\District;
+use App\Models\CritiqueHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +17,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class CritiqueController extends Controller
 {
     use AuthorizesRequests;
+
     public function index()
     {
         $critiques = Critique::where('user_id', Auth::id())
@@ -49,14 +50,16 @@ class CritiqueController extends Controller
                 ->withInput();
         }
 
+        // Ambil content dengan input()
         $content = $request->input('content');
 
         $badWords = $this->checkBadWords($content);
 
-        if (! empty($badWords)) {
+        if (!empty($badWords)) {
             return redirect()->back()
                 ->withErrors([
-                    'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '.implode(', ', $badWords),
+                    'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '
+                        . implode(', ', $badWords)
                 ])
                 ->withInput();
         }
@@ -85,7 +88,7 @@ class CritiqueController extends Controller
 
         CritiqueHistory::create([
             'critique_id' => $critique->id,
-            'old_status' => 'dikirim',
+            'old_status' => null,
             'new_status' => 'dikirim',
             'changed_by' => Auth::id(),
             'note' => 'Kritik dikirim oleh pengguna',
@@ -105,8 +108,10 @@ class CritiqueController extends Controller
             'regency',
             'district',
             'histories',
-            'response',
-        ])->findOrFail($id);
+            'response'
+        ])
+            ->where('user_id', Auth::id())
+            ->findOrFail($id);
 
         $this->authorize('view', $critique);
 
@@ -115,7 +120,8 @@ class CritiqueController extends Controller
 
     public function edit($id)
     {
-        $critique = Critique::findOrFail($id);
+        $critique = Critique::where('user_id', Auth::id())
+            ->findOrFail($id);
 
         $this->authorize('update', $critique);
 
@@ -134,12 +140,20 @@ class CritiqueController extends Controller
         $regencies = Regency::where(
             'province_id',
             $critique->province_id
-        )->orderBy('name')->get();
+        )
+            ->orderBy('name')
+            ->get();
 
-        $districts = District::where(
-            'regency_id',
-            $critique->regency_id
-        )->orderBy('name')->get();
+        $districts = collect();
+
+        if ($critique->regency_id) {
+            $districts = District::where(
+                'regency_id',
+                $critique->regency_id
+            )
+                ->orderBy('name')
+                ->get();
+        }
 
         return view('critique.edit', compact(
             'critique',
@@ -152,7 +166,8 @@ class CritiqueController extends Controller
 
     public function update(Request $request, $id)
     {
-        $critique = Critique::findOrFail($id);
+        $critique = Critique::where('user_id', Auth::id())
+            ->findOrFail($id);
 
         $this->authorize('update', $critique);
 
@@ -173,19 +188,32 @@ class CritiqueController extends Controller
                 ->withInput();
         }
 
+        // Ambil content dengan input()
         $content = $request->input('content');
 
         $badWords = $this->checkBadWords($content);
 
-        if (! empty($badWords)) {
+        if (!empty($badWords)) {
             return redirect()->back()
                 ->withErrors([
-                    'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '.implode(', ', $badWords),
+                    'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '
+                        . implode(', ', $badWords)
                 ])
                 ->withInput();
         }
 
-        $data = [
+        if ($request->hasFile('image')) {
+            if ($critique->image) {
+                Storage::disk('public')->delete($critique->image);
+            }
+
+            $imagePath = $request->file('image')
+                ->store('critique_images', 'public');
+
+            $critique->image = $imagePath;
+        }
+
+        $critique->update([
             'category_id' => $request->input('category_id'),
             'province_id' => $request->input('province_id'),
             'regency_id' => $request->input('regency_id'),
@@ -194,18 +222,7 @@ class CritiqueController extends Controller
             'title' => $request->input('title'),
             'content' => $content,
             'is_anonymous' => $request->boolean('is_anonymous'),
-        ];
-
-        if ($request->hasFile('image')) {
-            if ($critique->image) {
-                Storage::disk('public')->delete($critique->image);
-            }
-
-            $data['image'] = $request->file('image')
-                ->store('critique_images', 'public');
-        }
-
-        $critique->update($data);
+        ]);
 
         return redirect()
             ->route('critique.show', $critique->id)
@@ -214,7 +231,8 @@ class CritiqueController extends Controller
 
     public function destroy($id)
     {
-        $critique = Critique::findOrFail($id);
+        $critique = Critique::where('user_id', Auth::id())
+            ->findOrFail($id);
 
         $this->authorize('delete', $critique);
 
@@ -272,7 +290,7 @@ class CritiqueController extends Controller
             'sialan',
             'tolol',
             'bego',
-            'goblog',
+            'goblog'
         ];
 
         $found = [];
@@ -291,7 +309,9 @@ class CritiqueController extends Controller
         $regencies = Regency::where(
             'province_id',
             $request->input('province_id')
-        )->orderBy('name')->get();
+        )
+            ->orderBy('name')
+            ->get();
 
         return response()->json($regencies);
     }
@@ -301,7 +321,9 @@ class CritiqueController extends Controller
         $districts = District::where(
             'regency_id',
             $request->input('regency_id')
-        )->orderBy('name')->get();
+        )
+            ->orderBy('name')
+            ->get();
 
         return response()->json($districts);
     }

@@ -16,13 +16,6 @@
         </div>
     @endif
 
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     @if($critiques->count() > 0)
         <div class="card">
             <div class="card-body">
@@ -33,7 +26,6 @@
                                 <th>No</th>
                                 <th>Judul</th>
                                 <th>Kategori</th>
-                                <th>Tingkat</th>
                                 <th>Status</th>
                                 <th>Tanggal</th>
                                 <th>Aksi</th>
@@ -45,7 +37,6 @@
                                     <td>{{ $critiques->firstItem() + $index }}</td>
                                     <td>{{ Str::limit($critique->title, 30) }}</td>
                                     <td>{{ $critique->category->name }}</td>
-                                    <td><span class="text-capitalize">{{ $critique->government_level }}</span></td>
                                     <td>
                                         <span class="badge badge-status badge-{{ $critique->status }}">
                                             {{ ucfirst($critique->status) }}
