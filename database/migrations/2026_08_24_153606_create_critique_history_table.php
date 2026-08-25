@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('critique_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('critique_id');
-            $table->enum('old_status', ['dikirim', 'ditinjau', 'diproses', 'selesai', 'ditolak']);
+            $table->enum('old_status', ['dikirim', 'ditinjau', 'diproses', 'selesai', 'ditolak'])->nullable();
             $table->enum('new_status', ['dikirim', 'ditinjau', 'diproses', 'selesai', 'ditolak']);
             $table->unsignedBigInteger('changed_by');
             $table->text('note')->nullable();

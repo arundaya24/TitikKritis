@@ -7,9 +7,11 @@ use App\Models\Critique;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AdminDashboardController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
         $totalCritiques = Critique::count();

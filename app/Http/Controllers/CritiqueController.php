@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Critique;
 use App\Models\Category;
+use App\Models\Critique;
+use App\Models\CritiqueHistory;
+use App\Models\District;
 use App\Models\Province;
 use App\Models\Regency;
-use App\Models\District;
-use App\Models\CritiqueHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CritiqueController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
         $critiques = Critique::where('user_id', Auth::id())
@@ -51,10 +53,10 @@ class CritiqueController extends Controller
 
         $badWords = $this->checkBadWords($content);
 
-        if (!empty($badWords)) {
+        if (! empty($badWords)) {
             return redirect()->back()
                 ->withErrors([
-                    'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: ' . implode(', ', $badWords)
+                    'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '.implode(', ', $badWords),
                 ])
                 ->withInput();
         }
@@ -83,7 +85,7 @@ class CritiqueController extends Controller
 
         CritiqueHistory::create([
             'critique_id' => $critique->id,
-            'old_status' => null,
+            'old_status' => 'dikirim',
             'new_status' => 'dikirim',
             'changed_by' => Auth::id(),
             'note' => 'Kritik dikirim oleh pengguna',
@@ -175,10 +177,10 @@ class CritiqueController extends Controller
 
         $badWords = $this->checkBadWords($content);
 
-        if (!empty($badWords)) {
+        if (! empty($badWords)) {
             return redirect()->back()
                 ->withErrors([
-                    'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: ' . implode(', ', $badWords)
+                    'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '.implode(', ', $badWords),
                 ])
                 ->withInput();
         }

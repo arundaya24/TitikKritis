@@ -10,9 +10,11 @@ use App\Models\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AdminCritiqueController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request)
     {
         $query = Critique::with([

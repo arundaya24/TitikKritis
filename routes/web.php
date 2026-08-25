@@ -12,6 +12,10 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminCritiqueController;
 use App\Http\Controllers\Admin\AdminUserController;
 
+// Route publik, bisa diakses baik guest maupun user yang sudah login
+Route::get('/get-regencies', [RegisterController::class, 'getRegencies'])->name('get.regencies');
+Route::get('/get-districts', [RegisterController::class, 'getDistricts'])->name('get.districts');
+
 Route::middleware('guest')->group(function () {
     Route::get('/', function () {
         return redirect()->route('login');
@@ -20,8 +24,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
-    Route::get('/get-regencies', [RegisterController::class, 'getRegencies'])->name('get.regencies');
-    Route::get('/get-districts', [RegisterController::class, 'getDistricts'])->name('get.districts');
 });
 
 Route::middleware('auth')->group(function () {
@@ -62,4 +64,3 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 });
-

@@ -8,9 +8,11 @@ use App\Models\Province;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AdminUserController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
         $admins = User::where('role', 'admin')->orderBy('created_at', 'desc')->paginate(10);
