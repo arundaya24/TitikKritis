@@ -1,0 +1,160 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Critique;
+use App\Models\CritiqueHistory;
+use App\Models\Category;
+use App\Models\Response;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
+class AdminCritiqueController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Critique::with([
+            'user',
+            'category',
+            'province',
+            'regency',
+            'district',
+        ]);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('category')) {
+            $query->where(
+                'category_id',
+                $request->input('category')
+            );
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('content', 'like', '%' . $search . '%');
+            });
+        }
+
+        $critiques = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        $categories = Category::orderBy('name')->get();
+
+        $statuses = [
+            'dikirim',
+            'ditinjau',
+            'diproses',
+            'selesai',
+            'ditolak',
+        ];
+
+        return view(
+            'admin.critiques.index',
+            compact('critiques', 'categories', 'statuses')
+        );
+    }
+
+    public function show($id)
+    {
+        $critique = Critique::with([
+            'user',
+            'category',
+            'province',
+            'regency',
+            'district',
+            'histories',
+            'response',
+        ])->findOrFail($id);
+
+        $statuses = [
+            'dikirim',
+            'ditinjau',
+            'diproses',
+            'selesai',
+            'ditolak',
+        ];
+
+        return view(
+            'admin.critiques.show',
+            compact('critique', 'statuses')
+        );
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $critique = Critique::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:dikirim,ditinjau,diproses,selesai,ditolak',
+            'admin_note' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $oldStatus = $critique->status;
+
+        $newStatus = $request->input('status');
+        $adminNote = $request->input('admin_note');
+
+        $critique->update([
+            'status' => $newStatus,
+            'admin_note' => $adminNote,
+        ]);
+
+        CritiqueHistory::create([
+            'critique_id' => $critique->id,
+            'old_status' => $oldStatus,
+            'new_status' => $newStatus,
+            'changed_by' => Auth::id(),
+            'note' => 'Status diubah oleh admin',
+        ]);
+
+        return redirect()
+            ->route('admin.critiques.show', $critique->id)
+            ->with('success', 'Status kritik berhasil diperbarui!');
+    }
+
+    public function respond(Request $request, $id)
+    {
+        $critique = Critique::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'content' => 'required|string|min:10',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $content = $request->input('content');
+
+        Response::updateOrCreate(
+            [
+                'critique_id' => $critique->id,
+            ],
+            [
+                'admin_id' => Auth::id(),
+                'content' => $content,
+            ]
+        );
+
+        return redirect()
+            ->route('admin.critiques.show', $critique->id)
+            ->with('success', 'Tanggapan berhasil dikirim!');
+    }
+}
