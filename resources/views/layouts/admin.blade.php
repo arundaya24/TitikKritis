@@ -153,8 +153,11 @@
                 <a class="nav-link {{ request()->routeIs('admin.critiques.*') ? 'active' : '' }}" href="{{ route('admin.critiques.index') }}">
                     <i class="fas fa-list"></i> Kritik
                 </a>
-                <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
+                <a class="nav-link {{ request()->routeIs('admin.users.index') || request()->routeIs('admin.users.create') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                     <i class="fas fa-users-cog"></i> Kelola Admin
+                </a>
+                <a class="nav-link {{ request()->routeIs('admin.users.manage') || request()->routeIs('admin.users.detail') ? 'active' : '' }}" href="{{ route('admin.users.manage') }}">
+                    <i class="fas fa-users"></i> Manajemen User
                 </a>
             </nav>
         </div>
