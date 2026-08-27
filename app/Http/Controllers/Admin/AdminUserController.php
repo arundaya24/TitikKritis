@@ -13,9 +13,10 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class AdminUserController extends Controller
 {
     use AuthorizesRequests;
+
     public function index()
     {
-        $admins = User::where('role', 'admin')->orderBy('created_at', 'desc')->paginate(10);
+        $admins = User::role('admin')->orderBy('created_at', 'desc')->paginate(10);
         return view('admin.users.index', compact('admins'));
     }
 
@@ -45,7 +46,7 @@ class AdminUserController extends Controller
                 ->withInput();
         }
 
-        User::create([
+        $admin = User::create([
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
@@ -57,6 +58,8 @@ class AdminUserController extends Controller
             'address' => $request->address,
             'role' => 'admin',
         ]);
+
+        $admin->assignRole('admin');
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Admin berhasil ditambahkan!');

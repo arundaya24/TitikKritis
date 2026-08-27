@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Critique;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 class AdminUserManagementController extends Controller
@@ -14,7 +13,7 @@ class AdminUserManagementController extends Controller
     {
         // HANYA TAMPILKAN USER DENGAN ROLE 'user' (BUKAN ADMIN)
         $users = User::where('role', 'user')
-            ->withCount(['critiques' => function($query) {
+            ->withCount(['critiques' => function ($query) {
                 $query->whereNotNull('submitted_at');
             }])
             ->orderBy('created_at', 'desc')
@@ -39,9 +38,9 @@ class AdminUserManagementController extends Controller
     public function show($id)
     {
         // PASTIKAN YANG DILIHAT ADALAH USER BUKAN ADMIN
-        $user = User::where('role', 'user')->with(['critiques' => function($query) {
-                $query->orderBy('created_at', 'desc');
-            }, 'critiques.category'])
+        $user = User::where('role', 'user')->with(['critiques' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }, 'critiques.category'])
             ->findOrFail($id);
 
         $totalCritiques = $user->critiques->count();
@@ -86,6 +85,8 @@ class AdminUserManagementController extends Controller
 
         $user->role = 'admin';
         $user->save();
+
+        $user->syncRoles(['admin']);
 
         return redirect()->route('admin.users.manage')
             ->with('success', 'User berhasil dijadikan Admin!');

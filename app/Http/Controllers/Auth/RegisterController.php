@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\District;
 use App\Models\Province;
 use App\Models\Regency;
-use App\Models\District;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -16,6 +16,7 @@ class RegisterController extends Controller
     public function showRegistrationForm()
     {
         $provinces = Province::orderBy('name')->get();
+
         return view('auth.register', compact('provinces'));
     }
 
@@ -45,7 +46,7 @@ class RegisterController extends Controller
 
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'username' => $data['username'],
             'email' => $data['email'],
@@ -57,17 +58,23 @@ class RegisterController extends Controller
             'address' => $data['address'] ?? null,
             'role' => 'user',
         ]);
+
+        $user->assignRole('user');
+
+        return $user;
     }
 
     public function getRegencies(Request $request)
     {
         $regencies = Regency::where('province_id', $request->province_id)->orderBy('name')->get();
+
         return response()->json($regencies);
     }
 
     public function getDistricts(Request $request)
     {
         $districts = District::where('regency_id', $request->regency_id)->orderBy('name')->get();
+
         return response()->json($districts);
     }
 }
