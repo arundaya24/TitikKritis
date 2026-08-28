@@ -6,6 +6,13 @@
             <i class="fas fa-user-plus me-2"></i> Tambah Admin Baru
         </div>
         <div class="card-body">
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
             @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show">
                     <ul class="mb-0">
@@ -85,12 +92,29 @@
                     <label for="address" class="form-label">Alamat</label>
                     <textarea class="form-control" id="address" name="address" rows="2">{{ old('address') }}</textarea>
                 </div>
+
+                {{-- Pilihan Role --}}
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
+                    <select class="form-select" id="role" name="role" required>
+                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                        @if ($canCreateSuperAdmin)
+                            <option value="super_admin" {{ old('role') == 'super_admin' ? 'selected' : '' }}>
+                                Super Admin
+                            </option>
+                        @endif
+                    </select>
+                    @if (!$canCreateSuperAdmin)
+                        <small class="text-muted">Hanya Super Admin yang bisa membuat Super Admin baru.</small>
+                    @endif
+                </div>
+
                 <div class="d-flex justify-content-between">
                     <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Kembali
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Simpan Admin
+                        <i class="fas fa-save"></i> Simpan
                     </button>
                 </div>
             </form>
@@ -98,75 +122,35 @@
     </div>
 
     @push('scripts')
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
             $(document).ready(function() {
-                console.log('jQuery loaded!');
-
-                $('#province_id').on('change', function() {
+                $('#province_id').change(function() {
                     var provinceId = $(this).val();
-                    console.log('Province selected:', provinceId);
-
                     if (provinceId) {
-                        $.ajax({
-                            url: '{{ url('/get-regencies') }}',
-                            type: 'GET',
-                            data: {
-                                province_id: provinceId
-                            },
-                            dataType: 'json',
-                            success: function(data) {
-                                console.log('Regencies data:', data);
-                                var $regencySelect = $('#regency_id');
-                                $regencySelect.empty().append(
-                                    '<option value="">Pilih Kabupaten/Kota</option>');
-                                $.each(data, function(key, value) {
-                                    $regencySelect.append('<option value="' + value.id +
-                                        '">' + value.name + '</option>');
-                                });
-                                $('#district_id').empty().append(
-                                    '<option value="">Pilih Kecamatan</option>');
-                            },
-                            error: function(xhr) {
-                                console.log('Error AJAX:', xhr);
-                                alert('Gagal mengambil data kabupaten/kota! Cek console F12');
-                            }
+                        $.get('/get-regencies?province_id=' + provinceId, function(data) {
+                            $('#regency_id').empty().append(
+                                '<option value="">Pilih Kabupaten/Kota</option>');
+                            $.each(data, function(key, value) {
+                                $('#regency_id').append('<option value="' + value.id + '">' +
+                                    value.name + '</option>');
+                            });
+                            $('#district_id').empty().append(
+                                '<option value="">Pilih Kecamatan</option>');
                         });
-                    } else {
-                        $('#regency_id').empty().append('<option value="">Pilih Kabupaten/Kota</option>');
-                        $('#district_id').empty().append('<option value="">Pilih Kecamatan</option>');
                     }
                 });
 
-                $('#regency_id').on('change', function() {
+                $('#regency_id').change(function() {
                     var regencyId = $(this).val();
-                    console.log('Regency selected:', regencyId);
-
                     if (regencyId) {
-                        $.ajax({
-                            url: '{{ url('/get-districts') }}',
-                            type: 'GET',
-                            data: {
-                                regency_id: regencyId
-                            },
-                            dataType: 'json',
-                            success: function(data) {
-                                console.log('Districts data:', data);
-                                var $districtSelect = $('#district_id');
-                                $districtSelect.empty().append(
-                                    '<option value="">Pilih Kecamatan</option>');
-                                $.each(data, function(key, value) {
-                                    $districtSelect.append('<option value="' + value.id +
-                                        '">' + value.name + '</option>');
-                                });
-                            },
-                            error: function(xhr) {
-                                console.log('Error AJAX:', xhr);
-                                alert('Gagal mengambil data kecamatan! Cek console F12');
-                            }
+                        $.get('/get-districts?regency_id=' + regencyId, function(data) {
+                            $('#district_id').empty().append(
+                                '<option value="">Pilih Kecamatan</option>');
+                            $.each(data, function(key, value) {
+                                $('#district_id').append('<option value="' + value.id + '">' +
+                                    value.name + '</option>');
+                            });
                         });
-                    } else {
-                        $('#district_id').empty().append('<option value="">Pilih Kecamatan</option>');
                     }
                 });
             });

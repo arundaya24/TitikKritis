@@ -4,24 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Models\Critique;
 use App\Models\Category;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class StatisticController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $filter = $request->get('filter', 'saya'); // default: 'saya'
 
-        $totalCritiques = Critique::where('user_id', $user->id)->count();
+        // Base query
+        $query = Critique::query();
 
-        $statusCounts = Critique::where('user_id', $user->id)
+        // Filter berdasarkan pilihan
+        if ($filter === 'saya') {
+            $query->where('user_id', $user->id);
+        }
+        // 'semua' -> tidak ada filter user_id
+
+        // Ambil data
+        $totalCritiques = $query->count();
+
+        $statusCounts = (clone $query)
             ->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->pluck('total', 'status')
             ->toArray();
 
-        $categoryStats = Critique::where('user_id', $user->id)
+        $categoryStats = (clone $query)
             ->select('categories.name', DB::raw('count(critiques.id) as total'))
             ->join('categories', 'critiques.category_id', '=', 'categories.id')
             ->groupBy('categories.id', 'categories.name')
@@ -29,28 +41,33 @@ class StatisticController extends Controller
             ->limit(10)
             ->get();
 
-        $levelStats = Critique::where('user_id', $user->id)
+        $levelStats = (clone $query)
             ->select('government_level', DB::raw('count(*) as total'))
             ->groupBy('government_level')
             ->pluck('total', 'government_level')
             ->toArray();
 
-        $monthlyStats = Critique::where('user_id', $user->id)
+        $monthlyStats = (clone $query)
             ->select(DB::raw('MONTH(submitted_at) as month'), DB::raw('YEAR(submitted_at) as year'), DB::raw('count(*) as total'))
             ->groupBy('year', 'month')
             ->orderBy('year')
             ->orderBy('month')
             ->get();
 
-        $responseRate = Critique::where('user_id', $user->id)
+        // Response Rate (kritik yang punya tanggapan)
+        $responseRate = (clone $query)
             ->whereHas('response')
             ->count();
 
-        $avgResponseTime = Critique::where('user_id', $user->id)
+        // Average Response Time
+        $avgResponseTime = (clone $query)
             ->whereHas('response')
             ->join('responses', 'critiques.id', '=', 'responses.critique_id')
             ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, critiques.submitted_at, responses.created_at)) as avg_hours'))
             ->value('avg_hours');
+
+        // Total user yang pernah kirim kritik (untuk info tambahan)
+        $totalUsersWithCritiques = Critique::distinct('user_id')->count('user_id');
 
         return view('statistic.index', compact(
             'totalCritiques',
@@ -59,7 +76,9 @@ class StatisticController extends Controller
             'levelStats',
             'monthlyStats',
             'responseRate',
-            'avgResponseTime'
+            'avgResponseTime',
+            'filter',
+            'totalUsersWithCritiques'
         ));
     }
 }

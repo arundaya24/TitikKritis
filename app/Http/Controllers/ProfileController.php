@@ -8,8 +8,8 @@ use App\Models\District;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -19,6 +19,10 @@ class ProfileController extends Controller
         $provinces = Province::orderBy('name')->get();
         $regencies = Regency::where('province_id', $user->province_id)->orderBy('name')->get();
         $districts = District::where('regency_id', $user->regency_id)->orderBy('name')->get();
+
+        if ($user->isAdmin()) {
+            return view('profile.admin', compact('user', 'provinces', 'regencies', 'districts'));
+        }
 
         return view('profile.index', compact('user', 'provinces', 'regencies', 'districts'));
     }
@@ -36,12 +40,24 @@ class ProfileController extends Controller
             'regency_id' => 'required|exists:regencies,id',
             'district_id' => 'required|exists:districts,id',
             'address' => 'nullable|string',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
+        }
+
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                Storage::disk('public')->delete('avatars/' . $user->avatar);
+            }
+
+            $file = $request->file('avatar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('avatars', $filename, 'public');
+            $user->avatar = $filename;
         }
 
         $user->update([
@@ -59,33 +75,21 @@ class ProfileController extends Controller
             ->with('success', 'Profil berhasil diperbarui!');
     }
 
-    public function updatePhoto(Request $request)
+    // ===== FITUR HAPUS FOTO PROFILE =====
+    public function deleteAvatar()
     {
         $user = Auth::user();
 
-        $validator = Validator::make($request->all(), [
-            'photo' => 'required|image|mimes:jpeg,jpg,png|max:2048',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator);
+        if ($user->avatar) {
+            Storage::disk('public')->delete('avatars/' . $user->avatar);
+            $user->avatar = null;
+            $user->save();
+            return redirect()->route('profile.index')
+                ->with('success', 'Foto profile berhasil dihapus!');
         }
-
-        // Hapus foto lama kalau ada
-        if ($user->photo && Storage::disk('public')->exists($user->photo)) {
-            Storage::disk('public')->delete($user->photo);
-        }
-
-        // Simpan foto baru
-        $path = $request->file('photo')->store('profile-photos', 'public');
-
-        $user->update([
-            'photo' => $path,
-        ]);
 
         return redirect()->route('profile.index')
-            ->with('success', 'Foto profil berhasil diperbarui!');
+            ->with('error', 'Anda belum memiliki foto profile.');
     }
 
     public function updatePassword(Request $request)

@@ -23,6 +23,14 @@
             </div>
         @endif
 
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-1"></i>
+            <strong>Info:</strong>
+            <span class="badge bg-danger">Super Admin</span> memiliki akses penuh.
+            <span class="badge bg-primary">Admin</span> memiliki akses terbatas.
+            Minimal harus ada 1 admin/super admin yang aktif.
+        </div>
+
         @if($admins->count() > 0)
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -32,6 +40,7 @@
                             <th>Nama</th>
                             <th>Username</th>
                             <th>Email</th>
+                            <th>Role</th>
                             <th>Wilayah</th>
                             <th>Tanggal</th>
                             <th>Aksi</th>
@@ -44,21 +53,60 @@
                                 <td>{{ $admin->name }}</td>
                                 <td>{{ $admin->username }}</td>
                                 <td>{{ $admin->email }}</td>
+                                <td>
+                                    @if($admin->role === 'super_admin')
+                                        <span class="badge bg-danger">Super Admin</span>
+                                    @else
+                                        <span class="badge bg-primary">Admin</span>
+                                    @endif
+                                </td>
                                 <td>{{ $admin->province->name ?? '-' }}</td>
                                 <td>{{ $admin->created_at->format('d/m/Y') }}</td>
                                 <td>
-                                    @if($admin->id !== auth()->id())
-                                        <form action="{{ route('admin.users.destroy', $admin->id) }}" method="POST" class="d-inline"
-                                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus admin ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    @else
-                                        <span class="badge bg-secondary">Anda</span>
-                                    @endif
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        @if($admin->id !== auth()->id())
+                                            {{-- Promote ke Super Admin (hanya super admin) --}}
+                                            @if(auth()->user()->canCreateSuperAdmin() && $admin->role !== 'super_admin')
+                                                <form action="{{ route('admin.users.promote', $admin->id) }}" method="POST" class="d-inline"
+                                                      onsubmit="return confirm('Jadikan {{ $admin->name }} sebagai Super Admin?')">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="btn btn-danger btn-sm" title="Jadikan Super Admin">
+                                                        <i class="fas fa-crown"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            {{-- Turunkan ke User --}}
+                                            @if(auth()->user()->canManageAdmins() || $admin->role !== 'super_admin')
+                                                <form action="{{ route('admin.users.demote', $admin->id) }}" method="POST" class="d-inline"
+                                                      onsubmit="return confirm('Turunkan {{ $admin->name }} menjadi user biasa?')">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="btn btn-warning btn-sm" title="Turunkan menjadi user">
+                                                        <i class="fas fa-user-minus"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            {{-- Hapus --}}
+                                            @if(auth()->user()->canManageAdmins() || $admin->role !== 'super_admin')
+                                                <form action="{{ route('admin.users.destroy', $admin->id) }}" method="POST" class="d-inline"
+                                                      onsubmit="return confirm('Hapus {{ $admin->name }}?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @else
+                                            <span class="badge bg-secondary">Anda</span>
+                                            @if($admin->role === 'super_admin')
+                                                <span class="badge bg-danger">Super Admin</span>
+                                            @endif
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

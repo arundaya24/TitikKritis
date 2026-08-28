@@ -6,10 +6,10 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2><i class="fas fa-user-circle me-2"></i> Profile Saya</h2>
-                    <p class="text-muted">Kelola data pribadi Anda.</p>
+                    <h2><i class="fas fa-user-shield me-2"></i> Profile Admin</h2>
+                    <p class="text-muted">Kelola data pribadi Anda sebagai administrator.</p>
                 </div>
-                <a href="{{ route('dashboard') }}" class="btn btn-outline-primary">
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-primary">
                     <i class="fas fa-arrow-left me-1"></i> Kembali ke Dashboard
                 </a>
             </div>
@@ -42,7 +42,6 @@
     @endif
 
     <div class="row">
-        {{-- Sidebar Profile --}}
         <div class="col-md-4">
             <div class="card text-center">
                 <div class="card-body">
@@ -66,7 +65,11 @@
                     <h5 class="mt-3 fw-bold">{{ $user->name }}</h5>
                     <p class="text-muted">@ {{ $user->username }}</p>
                     <p>
-                        <span class="badge bg-info">User</span>
+                        @if($user->role === 'super_admin')
+                            <span class="badge bg-danger">Super Admin</span>
+                        @else
+                            <span class="badge bg-primary">Admin</span>
+                        @endif
                     </p>
                     <hr>
                     <p class="text-muted small">
@@ -91,19 +94,22 @@
             </div>
         </div>
 
-        {{-- Form Edit Profile --}}
         <div class="col-md-8">
+            {{-- Form Edit Profile --}}
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-edit me-2"></i> Edit Profile
-                    <span class="badge bg-info ms-2">User</span>
+                    @if($user->role === 'super_admin')
+                        <span class="badge bg-danger ms-2">Super Admin</span>
+                    @else
+                        <span class="badge bg-primary ms-2">Admin</span>
+                    @endif
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
-                        {{-- Upload Avatar --}}
                         <div class="mb-3">
                             <label for="avatar" class="form-label fw-semibold">Foto Profile</label>
                             <div class="d-flex align-items-center gap-3 flex-wrap">

@@ -20,7 +20,7 @@ class AdminUserManagementController extends Controller
             ->paginate(15);
 
         $totalUsers = User::where('role', 'user')->count();
-        $totalAdmins = User::where('role', 'admin')->count();
+        $totalAdmins = User::whereIn('role', ['admin', 'super_admin'])->count();
         $totalUsersRole = User::where('role', 'user')->count();
         $totalCritiques = Critique::count();
         $activeUsers = User::where('role', 'user')->whereHas('critiques')->count();
@@ -83,10 +83,9 @@ class AdminUserManagementController extends Controller
                 ->with('error', 'Anda tidak dapat mengubah role sendiri!');
         }
 
+        // ✅ BENAR: Langsung set role, tanpa syncRoles()
         $user->role = 'admin';
         $user->save();
-
-        $user->syncRoles(['admin']);
 
         return redirect()->route('admin.users.manage')
             ->with('success', 'User berhasil dijadikan Admin!');
