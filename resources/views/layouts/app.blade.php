@@ -48,14 +48,6 @@
             background-color: #0b5ed7;
         }
 
-        .footer {
-            background-color: #212529;
-            color: white;
-            padding: 20px 0;
-            margin-top: 50px;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-
         .profile-image {
             width: 40px;
             height: 40px;
@@ -75,31 +67,11 @@
             border-radius: 20px;
             font-size: 0.75rem;
         }
-
-        .badge-dikirim {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        .badge-ditinjau {
-            background-color: #17a2b8;
-            color: #fff;
-        }
-
-        .badge-diproses {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .badge-selesai {
-            background-color: #28a745;
-            color: #fff;
-        }
-
-        .badge-ditolak {
-            background-color: #dc3545;
-            color: #fff;
-        }
+        .badge-dikirim { background-color: #ffc107; color: #000; }
+        .badge-ditinjau { background-color: #17a2b8; color: #fff; }
+        .badge-diproses { background-color: #007bff; color: #fff; }
+        .badge-selesai { background-color: #28a745; color: #fff; }
+        .badge-ditolak { background-color: #dc3545; color: #fff; }
 
         .nav-link.active {
             font-weight: bold;
@@ -113,22 +85,18 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, background-color 0.3s, color 0.3s, border-color 0.3s;
         }
-
         .stat-card:hover {
             transform: translateY(-5px);
         }
-
         .stat-card .number {
             font-size: 2rem;
             font-weight: bold;
             color: #0d6efd;
         }
-
         .stat-card .label {
             color: #6c757d;
             font-size: 0.9rem;
         }
-
         .stat-card .icon {
             font-size: 2rem;
             color: #0d6efd;
@@ -145,41 +113,75 @@
             border: none;
             color: #0d6efd;
         }
-
         .theme-toggle-user:hover {
             background: rgba(13, 110, 253, 0.1);
         }
-
         body.dark-mode .theme-toggle-user {
             color: #ffd54f;
         }
-
         body.dark-mode .theme-toggle-user:hover {
             background: rgba(255, 213, 79, 0.1);
         }
 
-        /* ===== PERBAIKAN: Biar semua nav-item sejajar ===== */
+        /* Biar semua nav-item sejajar */
         .navbar-nav .nav-item {
             display: flex;
             align-items: center;
         }
-
         .navbar-nav .nav-link {
             padding-top: 8px;
             padding-bottom: 8px;
             line-height: 1.5;
         }
-
         .navbar-nav .dropdown .nav-link {
             padding-top: 8px;
             padding-bottom: 8px;
         }
-
         .navbar-nav .nav-item .theme-toggle-user {
             padding-top: 8px;
             padding-bottom: 8px;
             display: flex;
             align-items: center;
+        }
+
+        /* ===== FOOTER STICKY DI BAWAH ===== */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main.py-4 {
+            flex: 1;
+        }
+        .footer {
+            margin-top: auto;
+            background-color: #212529;
+            color: #ced4da;
+            padding: 40px 0 20px;
+            border-top: 3px solid #0d6efd;
+            width: 100%;
+        }
+        .hover-text-primary:hover {
+            color: #0d6efd !important;
+            transition: color 0.3s ease;
+        }
+
+        /* Dark mode footer */
+        body.dark-mode .footer {
+            background-color: #0d1b2a !important;
+            border-top-color: #4fc3f7 !important;
+        }
+        body.dark-mode .footer .text-secondary {
+            color: #b0b0b0 !important;
+        }
+        body.dark-mode .footer .text-white {
+            color: #e0e0e0 !important;
         }
 
         @media (max-width: 991.98px) {
@@ -202,12 +204,10 @@
     @auth
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
             <div class="container">
-                {{-- Brand --}}
                 <a class="navbar-brand" href="{{ route('home') }}">
                     <i class="fas fa-exclamation-triangle"></i> Titik Kritis
                 </a>
 
-                {{-- Badge --}}
                 @if (auth()->user()->isAdmin())
                     <span class="badge bg-danger me-2">Admin</span>
                 @else
@@ -217,71 +217,58 @@
                     </span>
                 @endif
 
-                {{-- Toggler --}}
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                {{-- Navbar Items --}}
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
-                        {{-- Menu User --}}
                         @if (!auth()->user()->isAdmin())
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}"
-                                    href="{{ route('home') }}">
+                                <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
                                     <i class="fas fa-home"></i> Home
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('statistic.index') ? 'active' : '' }}"
-                                    href="{{ route('statistic.index') }}">
+                                <a class="nav-link {{ request()->routeIs('statistic.index') ? 'active' : '' }}" href="{{ route('statistic.index') }}">
                                     <i class="fas fa-chart-bar"></i> Statistik
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('critique.create') ? 'active' : '' }}"
-                                    href="{{ route('critique.create') }}">
+                                <a class="nav-link {{ request()->routeIs('critique.create') ? 'active' : '' }}" href="{{ route('critique.create') }}">
                                     <i class="fas fa-pen"></i> Kritik
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('critique.history') ? 'active' : '' }}"
-                                    href="{{ route('critique.history') }}">
+                                <a class="nav-link {{ request()->routeIs('critique.history') ? 'active' : '' }}" href="{{ route('critique.history') }}">
                                     <i class="fas fa-history"></i> History Kritik
                                 </a>
                             </li>
                         @else
-                            {{-- Menu Admin --}}
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-                                    href="{{ route('admin.dashboard') }}">
+                                <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
                                     <i class="fas fa-chart-line"></i> Dashboard
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.critiques.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.critiques.index') }}">
+                                <a class="nav-link {{ request()->routeIs('admin.critiques.*') ? 'active' : '' }}" href="{{ route('admin.critiques.index') }}">
                                     <i class="fas fa-list"></i> Kritik
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.users.index') }}">
+                                <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                                     <i class="fas fa-users-cog"></i> Admin
                                 </a>
                             </li>
                         @endif
 
-                        {{-- Dark Mode Toggle --}}
                         <li class="nav-item d-flex align-items-center">
                             <button class="theme-toggle-user" id="userThemeToggle" title="Ganti Mode">
                                 <i class="fas fa-moon" id="userThemeIcon"></i>
                             </button>
                         </li>
 
-                        {{-- Profile Dropdown --}}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -295,9 +282,7 @@
                                         <i class="fas fa-user-circle"></i> Profile
                                     </a>
                                 </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="{{ route('logout') }}" method="POST">
                                         @csrf
@@ -322,27 +307,82 @@
         <footer class="footer">
             <div class="container">
                 <div class="row">
-                    <div class="col-md-4">
-                        <h5><i class="fas fa-exclamation-triangle"></i> Titik Kritis</h5>
-                        <p>Platform kritik masyarakat untuk pemerintah daerah.</p>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <h5 class="text-white fw-bold">
+                            <i class="fas fa-exclamation-triangle text-primary me-2"></i>Titik Kritis
+                        </h5>
+                        <p class="text-secondary" style="font-size: 0.95rem;">
+                            Platform kritik dan aspirasi masyarakat untuk
+                            <span class="text-white">pemerintah daerah</span> yang lebih
+                            transparan, akuntabel, dan responsif terhadap kebutuhan rakyat.
+                        </p>
+                        <div class="mt-3">
+                            <a href="#" class="text-secondary me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                            <a href="#" class="text-secondary me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                            <a href="#" class="text-secondary me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                            <a href="#" class="text-secondary me-3"><i class="fab fa-youtube fa-lg"></i></a>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <h5>Tentang</h5>
-                        <ul class="list-unstyled">
-                            <li><a href="#">Tentang Kami</a></li>
-                            <li><a href="#">Kebijakan Privasi</a></li>
-                            <li><a href="#">Syarat & Ketentuan</a></li>
+
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h6 class="text-white fw-bold">Tautan Cepat</h6>
+                        <ul class="list-unstyled" style="font-size: 0.9rem;">
+                            <li class="mb-2"><a href="{{ route('home') }}" class="text-secondary text-decoration-none hover-text-primary">Beranda</a></li>
+                            <li class="mb-2"><a href="{{ route('critique.create') }}" class="text-secondary text-decoration-none hover-text-primary">Kirim Kritik</a></li>
+                            <li class="mb-2"><a href="{{ route('critique.history') }}" class="text-secondary text-decoration-none hover-text-primary">History Kritik</a></li>
+                            <li class="mb-2"><a href="{{ route('statistic.index') }}" class="text-secondary text-decoration-none hover-text-primary">Statistik</a></li>
                         </ul>
                     </div>
-                    <div class="col-md-4">
-                        <h5>Kontak</h5>
-                        <p><i class="fas fa-envelope"></i> info@titikkritis.com</p>
-                        <p><i class="fas fa-phone"></i> (021) 1234-5678</p>
+
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <h6 class="text-white fw-bold">Tentang</h6>
+                        <ul class="list-unstyled" style="font-size: 0.9rem;">
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none hover-text-primary">Tentang Kami</a></li>
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none hover-text-primary">Cara Penggunaan</a></li>
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none hover-text-primary">FAQ</a></li>
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none hover-text-primary">Kebijakan Privasi</a></li>
+                            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none hover-text-primary">Syarat & Ketentuan</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <h6 class="text-white fw-bold">Kontak</h6>
+                        <ul class="list-unstyled" style="font-size: 0.9rem;">
+                            <li class="mb-2 text-secondary">
+                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                Jakarta, Indonesia
+                            </li>
+                            <li class="mb-2 text-secondary">
+                                <i class="fas fa-envelope text-primary me-2"></i>
+                                info@titikkritis.com
+                            </li>
+                            <li class="mb-2 text-secondary">
+                                <i class="fas fa-phone text-primary me-2"></i>
+                                (021) 1234-5678
+                            </li>
+                            <li class="mb-2 text-secondary">
+                                <i class="fas fa-clock text-primary me-2"></i>
+                                Senin - Jumat: 08.00 - 17.00
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <hr>
-                <div class="text-center">
-                    <p>&copy; {{ date('Y') }} Titik Kritis. All rights reserved.</p>
+
+                <hr class="border-secondary opacity-50 my-3">
+
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="text-secondary mb-0" style="font-size: 0.85rem;">
+                            &copy; {{ date('Y') }} <span class="text-white fw-semibold">Titik Kritis</span>.
+                            All rights reserved.
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <p class="text-secondary mb-0" style="font-size: 0.85rem;">
+                            <i class="fas fa-code text-primary me-1"></i>
+                            made to make the government better
+                        </p>
+                    </div>
                 </div>
             </div>
         </footer>
