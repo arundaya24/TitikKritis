@@ -7,10 +7,12 @@
     <title>Titik Kritis - Admin {{ $title ?? '' }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
     <style>
         body {
             background-color: #f4f6f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
         .admin-wrapper {
             display: flex;
@@ -24,6 +26,9 @@
             position: fixed;
             height: 100vh;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s;
         }
         .admin-sidebar .brand {
             padding: 0 20px 20px;
@@ -53,10 +58,32 @@
         .admin-sidebar .nav-link i {
             width: 25px;
         }
+        .admin-sidebar .sidebar-bottom {
+            margin-top: auto;
+            padding: 20px;
+            border-top: 1px solid #34495e;
+        }
+        .admin-sidebar .sidebar-bottom .theme-toggle {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #445566;
+            background: transparent;
+            color: #bdc3c7;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .admin-sidebar .sidebar-bottom .theme-toggle:hover {
+            background: #34495e;
+            color: white;
+        }
         .admin-content {
             margin-left: 250px;
             padding: 20px;
             flex: 1;
+            background-color: #f4f6f9;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
         }
         .admin-header {
             background: white;
@@ -67,6 +94,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: background-color 0.3s, color 0.3s;
         }
         .admin-header .user-info {
             display: flex;
@@ -88,18 +116,20 @@
         .card {
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
         .card-header {
             background-color: white;
             border-bottom: 1px solid #e9ecef;
             font-weight: 600;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
         .stat-card {
             background: white;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            transition: transform 0.2s, background-color 0.3s, color 0.3s;
         }
         .stat-card:hover {
             transform: translateY(-3px);
@@ -126,6 +156,174 @@
         .badge-diproses { background-color: #007bff; color: #fff; }
         .badge-selesai { background-color: #28a745; color: #fff; }
         .badge-ditolak { background-color: #dc3545; color: #fff; }
+
+        /* Dark Mode - Admin Content */
+        body.dark-mode .admin-content {
+            background-color: #1a1a2e !important;
+        }
+        body.dark-mode .admin-header {
+            background-color: #16213e !important;
+            border-bottom: 1px solid #0f3460 !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .card {
+            background-color: #16213e !important;
+            border: 1px solid #0f3460 !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .card-header {
+            background-color: #0f3460 !important;
+            border-bottom: 1px solid #1a1a4e !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .stat-card {
+            background-color: #16213e !important;
+            border: 1px solid #0f3460 !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .stat-card .label {
+            color: #888 !important;
+        }
+        body.dark-mode .stat-card .number {
+            color: #4fc3f7 !important;
+        }
+        body.dark-mode .table {
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .table-hover tbody tr:hover {
+            background-color: #1a1a4e !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #1a1a3e !important;
+        }
+        body.dark-mode .table-striped tbody tr:nth-of-type(even) {
+            background-color: #16213e !important;
+        }
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background-color: #0d1b2a !important;
+            border-color: #1a3a5c !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            background-color: #0d1b2a !important;
+            border-color: #4fc3f7 !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .form-label {
+            color: #b0b0b0 !important;
+        }
+        body.dark-mode .text-muted {
+            color: #888888 !important;
+        }
+        body.dark-mode .alert-success {
+            background-color: #1a3a2a !important;
+            border-color: #2a5a3a !important;
+            color: #8bc34a !important;
+        }
+        body.dark-mode .alert-danger {
+            background-color: #3a1a1a !important;
+            border-color: #5a2a2a !important;
+            color: #ef5350 !important;
+        }
+        body.dark-mode .alert-warning {
+            background-color: #3a2a1a !important;
+            border-color: #5a3a2a !important;
+            color: #ffa726 !important;
+        }
+        body.dark-mode .alert-info {
+            background-color: #1a2a3a !important;
+            border-color: #2a3a5a !important;
+            color: #4fc3f7 !important;
+        }
+        body.dark-mode .page-link {
+            background-color: #16213e !important;
+            border-color: #0f3460 !important;
+            color: #b0b0b0 !important;
+        }
+        body.dark-mode .page-link:hover {
+            background-color: #0f3460 !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .page-item.active .page-link {
+            background-color: #4fc3f7 !important;
+            border-color: #4fc3f7 !important;
+            color: #0d1b2a !important;
+        }
+        body.dark-mode .page-item.disabled .page-link {
+            background-color: #0d1b2a !important;
+            border-color: #1a3a5c !important;
+            color: #555 !important;
+        }
+        body.dark-mode .badge.bg-secondary {
+            background-color: #444 !important;
+        }
+        body.dark-mode .badge.bg-info {
+            background-color: #1a3a5c !important;
+            color: #4fc3f7 !important;
+        }
+        body.dark-mode .btn-close {
+            filter: invert(1);
+        }
+        body.dark-mode .modal-content {
+            background-color: #16213e !important;
+            border-color: #0f3460 !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .modal-header {
+            border-bottom-color: #0f3460 !important;
+        }
+        body.dark-mode .modal-footer {
+            border-top-color: #0f3460 !important;
+        }
+        body.dark-mode .dropdown-menu {
+            background-color: #16213e !important;
+            border-color: #0f3460 !important;
+        }
+        body.dark-mode .dropdown-item {
+            color: #b0b0b0 !important;
+        }
+        body.dark-mode .dropdown-item:hover {
+            background-color: #0f3460 !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .dropdown-divider {
+            border-color: #0f3460 !important;
+        }
+        body.dark-mode .admin-sidebar {
+            background-color: #0d1b2a !important;
+        }
+        body.dark-mode .admin-sidebar .brand {
+            border-bottom-color: #1a3a5c !important;
+        }
+        body.dark-mode .admin-sidebar .brand h4 {
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .admin-sidebar .nav-link {
+            color: #888 !important;
+        }
+        body.dark-mode .admin-sidebar .nav-link:hover {
+            background-color: #1a3a5c !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-mode .admin-sidebar .nav-link.active {
+            background-color: #4fc3f7 !important;
+            color: #0d1b2a !important;
+        }
+        body.dark-mode .admin-sidebar .sidebar-bottom {
+            border-top-color: #1a3a5c !important;
+        }
+        body.dark-mode .admin-sidebar .sidebar-bottom .theme-toggle {
+            border-color: #1a3a5c !important;
+            color: #888 !important;
+        }
+        body.dark-mode .admin-sidebar .sidebar-bottom .theme-toggle:hover {
+            background: #1a3a5c !important;
+            color: #e0e0e0 !important;
+        }
+
         @media (max-width: 768px) {
             .admin-sidebar {
                 width: 100%;
@@ -160,6 +358,11 @@
                     <i class="fas fa-users"></i> Manajemen User
                 </a>
             </nav>
+            <div class="sidebar-bottom">
+                <button class="theme-toggle" id="adminThemeToggle">
+                    <i class="fas fa-moon" id="adminThemeIcon"></i> Mode Gelap
+                </button>
+            </div>
         </div>
 
         <div class="admin-content">
@@ -189,6 +392,36 @@
             setTimeout(function() {
                 $('.alert').fadeOut('slow');
             }, 5000);
+        });
+
+        // Dark Mode Toggle for Admin
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('adminThemeToggle');
+            const icon = document.getElementById('adminThemeIcon');
+
+            // Cek preferensi yang tersimpan
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                toggle.innerHTML = '<i class="fas fa-sun"></i> Mode Terang';
+            }
+
+            toggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+
+                if (document.body.classList.contains('dark-mode')) {
+                    localStorage.setItem('theme', 'dark');
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                    toggle.innerHTML = '<i class="fas fa-sun"></i> Mode Terang';
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                    toggle.innerHTML = '<i class="fas fa-moon"></i> Mode Gelap';
+                }
+            });
         });
     </script>
     @stack('scripts')

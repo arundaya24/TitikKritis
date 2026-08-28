@@ -8,6 +8,7 @@ use App\Models\District;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
@@ -56,6 +57,35 @@ class ProfileController extends Controller
 
         return redirect()->route('profile.index')
             ->with('success', 'Profil berhasil diperbarui!');
+    }
+
+    public function updatePhoto(Request $request)
+    {
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'photo' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator);
+        }
+
+        // Hapus foto lama kalau ada
+        if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+            Storage::disk('public')->delete($user->photo);
+        }
+
+        // Simpan foto baru
+        $path = $request->file('photo')->store('profile-photos', 'public');
+
+        $user->update([
+            'photo' => $path,
+        ]);
+
+        return redirect()->route('profile.index')
+            ->with('success', 'Foto profil berhasil diperbarui!');
     }
 
     public function updatePassword(Request $request)

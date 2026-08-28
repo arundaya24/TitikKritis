@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,41 +8,50 @@
     <title>Titik Kritis - {{ $title ?? 'Platform Kritik Masyarakat' }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
     <style>
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         .navbar-brand {
             font-weight: bold;
             color: #0d6efd !important;
         }
+
         .navbar-brand i {
             font-size: 1.5rem;
         }
+
         .card {
             border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .card-header {
             background-color: #0d6efd;
             color: white;
             border-radius: 15px 15px 0 0 !important;
             font-weight: bold;
         }
+
         .btn-primary {
             background-color: #0d6efd;
             border: none;
         }
+
         .btn-primary:hover {
             background-color: #0b5ed7;
         }
+
         .footer {
             background-color: #212529;
             color: white;
             padding: 20px 0;
             margin-top: 50px;
         }
+
         .profile-image {
             width: 40px;
             height: 40px;
@@ -54,22 +64,45 @@
             font-weight: bold;
             font-size: 1.2rem;
         }
+
         .badge-status {
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.75rem;
         }
-        .badge-dikirim { background-color: #ffc107; color: #000; }
-        .badge-ditinjau { background-color: #17a2b8; color: #fff; }
-        .badge-diproses { background-color: #007bff; color: #fff; }
-        .badge-selesai { background-color: #28a745; color: #fff; }
-        .badge-ditolak { background-color: #dc3545; color: #fff; }
+
+        .badge-dikirim {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .badge-ditinjau {
+            background-color: #17a2b8;
+            color: #fff;
+        }
+
+        .badge-diproses {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .badge-selesai {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .badge-ditolak {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
         .nav-link.active {
             font-weight: bold;
             color: #0d6efd !important;
         }
     </style>
 </head>
+
 <body>
     @auth
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
@@ -88,17 +121,20 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('statistic.index') ? 'active' : '' }}" href="{{ route('statistic.index') }}">
+                            <a class="nav-link {{ request()->routeIs('statistic.index') ? 'active' : '' }}"
+                                href="{{ route('statistic.index') }}">
                                 <i class="fas fa-chart-bar"></i> Statistik
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('critique.create') ? 'active' : '' }}" href="{{ route('critique.create') }}">
+                            <a class="nav-link {{ request()->routeIs('critique.create') ? 'active' : '' }}"
+                                href="{{ route('critique.create') }}">
                                 <i class="fas fa-pen"></i> Kritik
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('critique.history') ? 'active' : '' }}" href="{{ route('critique.history') }}">
+                            <a class="nav-link {{ request()->routeIs('critique.history') ? 'active' : '' }}"
+                                href="{{ route('critique.history') }}">
                                 <i class="fas fa-history"></i> History Kritik
                             </a>
                         </li>
@@ -113,9 +149,11 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="{{ route('profile.index') }}">
-                                    <i class="fas fa-user-circle"></i> Profile
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                        <i class="fas fa-user-circle"></i> Profile
+                                    </a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li>
                                     <form action="{{ route('logout') }}" method="POST">
                                         @csrf
@@ -123,6 +161,11 @@
                                             <i class="fas fa-sign-out-alt"></i> Logout
                                         </button>
                                     </form>
+                                </li>
+                                <li class="nav-item me-2">
+                                    <button class="theme-toggle" id="themeToggle" title="Ganti Mode">
+                                        <i class="fas fa-moon" id="themeIcon"></i>
+                                    </button>
                                 </li>
                             </ul>
                         </li>
@@ -145,7 +188,37 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+        < script >
+            // Dark Mode Toggle
+            document.addEventListener('DOMContentLoaded', function() {
+                const toggle = document.getElementById('themeToggle');
+                const icon = document.getElementById('themeIcon');
+
+                // Cek preferensi yang tersimpan
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
+
+                toggle.addEventListener('click', function() {
+                    document.body.classList.toggle('dark-mode');
+
+                    if (document.body.classList.contains('dark-mode')) {
+                        localStorage.setItem('theme', 'dark');
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun');
+                    } else {
+                        localStorage.setItem('theme', 'light');
+                        icon.classList.remove('fa-sun');
+                        icon.classList.add('fa-moon');
+                    }
+                });
+            });
+    </>
+    </script>
     @stack('scripts')
 </body>
+
 </html>

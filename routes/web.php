@@ -36,6 +36,7 @@ Route::middleware('guest')->group(function () {
 
 // ============ USER ROUTES (AUTH) ============
 Route::middleware('auth')->group(function () {
+    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
