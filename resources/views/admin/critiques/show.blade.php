@@ -163,9 +163,6 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="mt-2">
-                                <textarea class="form-control" name="admin_note" rows="2" placeholder="Catatan admin (opsional)">{{ $critique->admin_note }}</textarea>
-                            </div>
                         </form>
                     </div>
 

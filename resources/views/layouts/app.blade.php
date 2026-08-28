@@ -29,6 +29,7 @@
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            overflow: hidden;
         }
 
         .card-header {
@@ -36,6 +37,10 @@
             color: white;
             border-radius: 15px 15px 0 0 !important;
             font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .card-body {
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -136,7 +141,6 @@
             background: rgba(255, 213, 79, 0.1);
         }
 
-        /* Biar semua nav-item sejajar */
         .navbar-nav .nav-item {
             display: flex;
             align-items: center;
@@ -160,7 +164,6 @@
             align-items: center;
         }
 
-        /* Avatar Navbar */
         .navbar-avatar {
             width: 35px;
             height: 35px;
@@ -169,7 +172,6 @@
             border: 2px solid #0d6efd;
         }
 
-        /* ===== FOOTER STICKY DI BAWAH ===== */
         html,
         body {
             height: 100%;
@@ -202,7 +204,105 @@
             transition: color 0.3s ease;
         }
 
-        /* Dark mode footer */
+        /* ================================================================ */
+        /* ===== DARK MODE ===== */
+        /* ================================================================ */
+        body.dark-mode {
+            background-color: #1a1a2e !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .navbar {
+            background-color: #16213e !important;
+            border-bottom: 1px solid #0f3460 !important;
+        }
+
+        body.dark-mode .navbar-brand {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .nav-link {
+            color: #b0b0b0 !important;
+        }
+
+        body.dark-mode .nav-link.active {
+            color: #4fc3f7 !important;
+        }
+
+        body.dark-mode .card {
+            background-color: #16213e !important;
+            border: 1px solid #0f3460 !important;
+            color: #e0e0e0 !important;
+            border-radius: 15px !important;
+            overflow: hidden !important;
+        }
+
+        body.dark-mode .card-header {
+            background-color: #0f3460 !important;
+            border-bottom: 1px solid #1a1a4e !important;
+            color: #e0e0e0 !important;
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        body.dark-mode .card-body {
+            background-color: #16213e !important;
+            color: #e0e0e0 !important;
+            border-radius: 0 0 15px 15px !important;
+        }
+
+        body.dark-mode .table {
+            color: #e0e0e0 !important;
+            border-radius: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        body.dark-mode .table thead th {
+            background-color: #0f3460 !important;
+            color: #e0e0e0 !important;
+            border-bottom: 2px solid #1a3a5c !important;
+        }
+
+        body.dark-mode .table tbody td {
+            background-color: #16213e !important;
+            color: #e0e0e0 !important;
+            border-bottom: 1px solid #1a3a5c !important;
+        }
+
+        body.dark-mode .table-hover tbody tr:hover td {
+            background-color: #1a1a4e !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .table-striped tbody tr:nth-of-type(odd) td {
+            background-color: #1a1a3e !important;
+        }
+
+        body.dark-mode .table-striped tbody tr:nth-of-type(even) td {
+            background-color: #16213e !important;
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background-color: #0d1b2a !important;
+            border-color: #1a3a5c !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            background-color: #0d1b2a !important;
+            border-color: #4fc3f7 !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .form-label {
+            color: #b0b0b0 !important;
+        }
+
+        body.dark-mode .text-muted {
+            color: #888888 !important;
+        }
+
         body.dark-mode .footer {
             background-color: #0d1b2a !important;
             border-top-color: #4fc3f7 !important;
@@ -216,9 +316,150 @@
             color: #e0e0e0 !important;
         }
 
-        /* Dark mode avatar border */
         body.dark-mode .navbar-avatar {
             border-color: #4fc3f7 !important;
+        }
+
+        body.dark-mode .stat-card {
+            background-color: #16213e !important;
+            border: 1px solid #0f3460 !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .stat-card .number {
+            color: #4fc3f7 !important;
+        }
+
+        body.dark-mode .stat-card .label {
+            color: #888 !important;
+        }
+
+        body.dark-mode .stat-card .icon {
+            color: #4fc3f7 !important;
+            opacity: 0.3;
+        }
+
+        body.dark-mode .list-group-item {
+            background-color: #16213e !important;
+            color: #e0e0e0 !important;
+            border-color: #1a3a5c !important;
+        }
+
+        body.dark-mode .list-group-item .badge {
+            background-color: #0f3460 !important;
+            color: #4fc3f7 !important;
+        }
+
+        body.dark-mode .dropdown-menu {
+            background-color: #16213e !important;
+            border-color: #0f3460 !important;
+        }
+
+        body.dark-mode .dropdown-item {
+            color: #b0b0b0 !important;
+        }
+
+        body.dark-mode .dropdown-item:hover {
+            background-color: #0f3460 !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .dropdown-divider {
+            border-color: #0f3460 !important;
+        }
+
+        body.dark-mode .alert-success {
+            background-color: #1a3a2a !important;
+            border-color: #2a5a3a !important;
+            color: #8bc34a !important;
+        }
+
+        body.dark-mode .alert-danger {
+            background-color: #3a1a1a !important;
+            border-color: #5a2a2a !important;
+            color: #ef5350 !important;
+        }
+
+        body.dark-mode .alert-warning {
+            background-color: #3a2a1a !important;
+            border-color: #5a3a2a !important;
+            color: #ffa726 !important;
+        }
+
+        body.dark-mode .alert-info {
+            background-color: #1a2a3a !important;
+            border-color: #2a3a5a !important;
+            color: #4fc3f7 !important;
+        }
+
+        body.dark-mode .page-link {
+            background-color: #16213e !important;
+            border-color: #0f3460 !important;
+            color: #b0b0b0 !important;
+        }
+
+        body.dark-mode .page-link:hover {
+            background-color: #0f3460 !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .page-item.active .page-link {
+            background-color: #4fc3f7 !important;
+            border-color: #4fc3f7 !important;
+            color: #0d1b2a !important;
+        }
+
+        body.dark-mode .page-item.disabled .page-link {
+            background-color: #0d1b2a !important;
+            border-color: #1a3a5c !important;
+            color: #555 !important;
+        }
+
+        body.dark-mode .badge.bg-secondary {
+            background-color: #444 !important;
+        }
+
+        body.dark-mode .badge.bg-info {
+            background-color: #1a3a5c !important;
+            color: #4fc3f7 !important;
+        }
+
+        body.dark-mode .badge.bg-primary {
+            background-color: #1a3a5c !important;
+            color: #4fc3f7 !important;
+        }
+
+        body.dark-mode .badge.bg-success {
+            background-color: #1a3a2a !important;
+            color: #8bc34a !important;
+        }
+
+        body.dark-mode .badge.bg-danger {
+            background-color: #3a1a1a !important;
+            color: #ef5350 !important;
+        }
+
+        body.dark-mode .badge.bg-warning {
+            background-color: #3a2a1a !important;
+            color: #ffa726 !important;
+        }
+
+        body.dark-mode .modal-content {
+            background-color: #16213e !important;
+            border-color: #0f3460 !important;
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .modal-header {
+            border-bottom-color: #0f3460 !important;
+        }
+
+        body.dark-mode .modal-footer {
+            border-top-color: #0f3460 !important;
+        }
+
+        body.dark-mode .btn-close {
+            filter: invert(1);
         }
 
         @media (max-width: 991.98px) {
@@ -309,19 +550,12 @@
                             </li>
                         @endif
 
-                        {{-- Google Translate --}}
-                        <li class="nav-item d-flex align-items-center">
-                            <div id="google_translate_element" class="me-2"></div>
-                        </li>
-
-                        {{-- Dark Mode Toggle --}}
                         <li class="nav-item d-flex align-items-center">
                             <button class="theme-toggle-user" id="userThemeToggle" title="Ganti Mode">
                                 <i class="fas fa-moon" id="userThemeIcon"></i>
                             </button>
                         </li>
 
-                        {{-- Profile Dropdown dengan Avatar --}}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -456,21 +690,6 @@
         </footer>
     @endif
 
-    {{-- Google Translate --}}
-    <script type="text/javascript">
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'id',
-                includedLanguages: 'af,sq,am,ar,hy,az,eu,be,bn,bs,bg,ca,ceb,ny,zh-CN,zh-TW,co,hr,cs,da,nl,en,eo,et,tl,fi,fr,fy,gl,ka,de,el,gu,ht,ha,haw,iw,hi,hmn,hu,is,ig,id,ga,it,ja,jw,kn,kk,km,ko,ku,ky,lo,la,lv,lt,lb,mk,mg,ms,ml,mt,mi,mr,mn,my,ne,no,ps,fa,pl,pt,pa,ro,ru,sm,gd,sr,st,sn,sd,si,sk,sl,so,es,su,sw,sv,tg,ta,te,th,tr,uk,ur,uz,vi,cy,xh,yi,yo,zu',
-                layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
-                autoDisplay: false,
-                multilanguagePage: true
-            }, 'google_translate_element');
-        }
-    </script>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -506,40 +725,6 @@
                     }
                 });
             }
-        });
-
-        // ============ GOOGLE TRANSLATE ============
-        document.addEventListener('DOMContentLoaded', function() {
-            var savedLang = localStorage.getItem('googleTranslateLang');
-
-            if (savedLang) {
-                var checkExist = setInterval(function() {
-                    var select = document.querySelector('.goog-te-combo');
-                    if (select) {
-                        clearInterval(checkExist);
-                        select.value = savedLang;
-                        select.dispatchEvent(new Event('change'));
-                    }
-                }, 500);
-            }
-
-            var hideBanner = setInterval(function() {
-                var banner = document.querySelector('.goog-te-banner-frame');
-                if (banner) {
-                    banner.style.display = 'none';
-                    banner.style.visibility = 'hidden';
-                    banner.style.height = '0';
-                }
-                if (document.body.style.top !== '0px') {
-                    document.body.style.top = '0px';
-                }
-            }, 100);
-
-            document.addEventListener('change', function(e) {
-                if (e.target.classList.contains('goog-te-combo')) {
-                    localStorage.setItem('googleTranslateLang', e.target.value);
-                }
-            });
         });
     </script>
     @stack('scripts')

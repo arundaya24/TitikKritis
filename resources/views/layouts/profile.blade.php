@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/dark-mode-user.css') }}">
     <style>
+        /* ===== BASE ===== */
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -59,11 +60,13 @@
             min-height: 100vh;
         }
 
-        /* Dark mode */
+        /* ===== DARK MODE ===== */
         body.dark-mode {
             background-color: #1a1a2e !important;
             color: #e0e0e0 !important;
         }
+
+        /* Card */
         body.dark-mode .card {
             background-color: #16213e !important;
             border: 1px solid #0f3460 !important;
@@ -78,6 +81,8 @@
             background-color: #16213e !important;
             color: #e0e0e0 !important;
         }
+
+        /* Forms */
         body.dark-mode .form-control,
         body.dark-mode .form-select {
             background-color: #0d1b2a !important;
@@ -89,6 +94,7 @@
             background-color: #0d1b2a !important;
             border-color: #4fc3f7 !important;
             color: #e0e0e0 !important;
+            box-shadow: 0 0 0 0.25rem rgba(79, 195, 247, 0.25) !important;
         }
         body.dark-mode .form-label {
             color: #b0b0b0 !important;
@@ -96,6 +102,8 @@
         body.dark-mode .text-muted {
             color: #888888 !important;
         }
+
+        /* Buttons */
         body.dark-mode .btn-outline-primary {
             border-color: #1a3a5c !important;
             color: #b0b0b0 !important;
@@ -103,6 +111,66 @@
         body.dark-mode .btn-outline-primary:hover {
             background-color: #1a3a5c !important;
             color: #e0e0e0 !important;
+        }
+        body.dark-mode .btn-outline-danger {
+            border-color: #5a2a2a !important;
+            color: #ef5350 !important;
+        }
+        body.dark-mode .btn-outline-danger:hover {
+            background-color: #3a1a1a !important;
+            color: #ef5350 !important;
+        }
+        body.dark-mode .btn-warning {
+            background-color: #3a2a1a !important;
+            border-color: #5a3a2a !important;
+            color: #ffa726 !important;
+        }
+        body.dark-mode .btn-warning:hover {
+            background-color: #5a3a2a !important;
+            color: #ffa726 !important;
+        }
+
+        /* Alerts */
+        body.dark-mode .alert-success {
+            background-color: #1a3a2a !important;
+            border-color: #2a5a3a !important;
+            color: #8bc34a !important;
+        }
+        body.dark-mode .alert-danger {
+            background-color: #3a1a1a !important;
+            border-color: #5a2a2a !important;
+            color: #ef5350 !important;
+        }
+
+        /* Badge */
+        body.dark-mode .badge.bg-info {
+            background-color: #1a3a5c !important;
+            color: #4fc3f7 !important;
+        }
+        body.dark-mode .badge.bg-primary {
+            background-color: #1a3a5c !important;
+            color: #4fc3f7 !important;
+        }
+        body.dark-mode .badge.bg-danger {
+            background-color: #3a1a1a !important;
+            color: #ef5350 !important;
+        }
+        body.dark-mode .badge.bg-success {
+            background-color: #1a3a2a !important;
+            color: #8bc34a !important;
+        }
+
+        /* Border avatar */
+        body.dark-mode img[style*="border: 4px solid #0d6efd;"] {
+            border-color: #4fc3f7 !important;
+        }
+        body.dark-mode img[style*="border: 2px solid #0d6efd;"] {
+            border-color: #4fc3f7 !important;
+        }
+
+        /* Hr */
+        body.dark-mode hr {
+            border-color: #1a3a5c !important;
         }
     </style>
 </head>
@@ -113,6 +181,17 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    {{-- Script untuk sync dark mode dari localStorage --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cek preferensi dari localStorage
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+    </script>
+
     @stack('scripts')
 </body>
 </html>
