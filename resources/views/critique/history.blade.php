@@ -2,6 +2,29 @@
 
 @push('styles')
 <style>
+    /* ===== DARK MODE - TAB ===== */
+    body.dark-mode .nav-tabs .nav-link {
+        color: #b0b0b0 !important;
+        background-color: transparent !important;
+        border-color: transparent !important;
+    }
+
+    body.dark-mode .nav-tabs .nav-link:hover {
+        color: #e0e0e0 !important;
+        border-color: #1a3a5c !important;
+    }
+
+    body.dark-mode .nav-tabs .nav-link.active {
+        color: #4fc3f7 !important;
+        background-color: #16213e !important;
+        border-color: #1a3a5c !important;
+        border-bottom-color: #16213e !important;
+    }
+
+    body.dark-mode .nav-tabs {
+        border-bottom-color: #1a3a5c !important;
+    }
+
     /* ===== DARK MODE - CARD & TABLE ===== */
     body.dark-mode .card {
         background-color: #16213e !important;
@@ -42,35 +65,6 @@
 
     body.dark-mode .table-striped tbody tr:nth-of-type(even) td {
         background-color: #16213e !important;
-    }
-
-    /* ===== DARK MODE - TAB ===== */
-    body.dark-mode .nav-tabs {
-        background-color: #1a1a2e !important; /* ADDED: background bar tab */
-        border-bottom-color: #1a3a5c !important;
-    }
-
-    body.dark-mode .nav-tabs .nav-link {
-        color: #b0b0b0 !important;
-        background-color: transparent !important; /* ADDED (explicit) */
-        border-color: transparent !important;
-    }
-
-    body.dark-mode .nav-tabs .nav-link:hover {
-        color: #e0e0e0 !important;
-        background-color: #16213e !important; /* ADDED */
-        border-color: #1a3a5c !important;
-    }
-
-    body.dark-mode .nav-tabs .nav-link.active {
-        color: #4fc3f7 !important;
-        background-color: #16213e !important;
-        border-color: #1a3a5c !important;
-        border-bottom-color: #16213e !important;
-    }
-
-    body.dark-mode .tab-content {
-        background-color: transparent !important; /* ADDED */
     }
 
     /* ===== DARK MODE - BADGE ===== */

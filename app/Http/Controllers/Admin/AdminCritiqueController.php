@@ -10,6 +10,7 @@ use App\Models\Response;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AdminCritiqueController extends Controller
@@ -31,15 +32,15 @@ class AdminCritiqueController extends Controller
         }
 
         if ($request->filled('category')) {
-            $query->where(
-                'category_id',
-                $request->input('category')
-            );
+            $query->where('category_id', $request->input('category'));
+        }
+
+        if ($request->filled('archived')) {
+            $query->where('is_archived', $request->input('archived'));
         }
 
         if ($request->filled('search')) {
             $search = $request->input('search');
-
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', '%'.$search.'%')
                     ->orWhere('content', 'like', '%'.$search.'%');
@@ -64,6 +65,49 @@ class AdminCritiqueController extends Controller
             'admin.critiques.index',
             compact('critiques', 'categories', 'statuses')
         );
+    }
+
+    public function archiveIndex(Request $request)
+    {
+        $query = Critique::with([
+            'user',
+            'category',
+            'province',
+            'regency',
+            'district',
+        ])->where('is_archived', true);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->input('category'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('content', 'like', '%'.$search.'%');
+            });
+        }
+
+        $critiques = $query
+            ->orderBy('updated_at', 'desc')
+            ->paginate(15);
+
+        $categories = Category::orderBy('name')->get();
+
+        $statuses = [
+            'dikirim',
+            'ditinjau',
+            'diproses',
+            'selesai',
+            'ditolak',
+        ];
+
+        return view('admin.critiques.archive', compact('critiques', 'categories', 'statuses'));
     }
 
     public function show($id)

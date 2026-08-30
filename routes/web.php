@@ -57,7 +57,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/get-regencies-critique', [CritiqueController::class, 'getRegencies'])->name('get.regencies.critique');
     Route::get('/get-districts-critique', [CritiqueController::class, 'getDistricts'])->name('get.districts.critique');
 
-    // ===== FITUR USER =====
     Route::delete('/critique/force-delete/{id}', [CritiqueController::class, 'forceDelete'])->name('critique.force.delete');
     Route::put('/critique/archive/{id}', [CritiqueController::class, 'archive'])->name('critique.archive');
     Route::put('/critique/unarchive/{id}', [CritiqueController::class, 'unarchive'])->name('critique.unarchive');
@@ -72,6 +71,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/critiques/{id}/status', [AdminCritiqueController::class, 'updateStatus'])->name('critiques.status');
     Route::post('/critiques/{id}/respond', [AdminCritiqueController::class, 'respond'])->name('critiques.respond');
 
+    Route::delete('/critiques/force-delete/{id}', [AdminCritiqueController::class, 'forceDelete'])->name('admin.critiques.force.delete');
+    Route::put('/critiques/archive/{id}', [AdminCritiqueController::class, 'archive'])->name('admin.critiques.archive');
+    Route::put('/critiques/unarchive/{id}', [AdminCritiqueController::class, 'unarchive'])->name('admin.critiques.unarchive');
+    Route::delete('/critiques/delete-archived/{id}', [AdminCritiqueController::class, 'deleteArchived'])->name('admin.critiques.delete.archived');
+
+    Route::get('/critiques/archived-list', [AdminCritiqueController::class, 'archiveIndex'])->name('critiques.archive');
+
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
     Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
@@ -83,10 +89,4 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/users/detail/{id}', [AdminUserManagementController::class, 'show'])->name('users.detail');
     Route::delete('/users/delete/{id}', [AdminUserManagementController::class, 'destroy'])->name('users.delete');
     Route::get('/users/toggle/{id}', [AdminUserManagementController::class, 'toggleAdmin'])->name('users.toggle');
-
-    // ===== FITUR ADMIN =====
-    Route::delete('/critiques/force-delete/{id}', [AdminCritiqueController::class, 'forceDelete'])->name('admin.critiques.force.delete');
-    Route::put('/critiques/archive/{id}', [AdminCritiqueController::class, 'archive'])->name('admin.critiques.archive');
-    Route::put('/critiques/unarchive/{id}', [AdminCritiqueController::class, 'unarchive'])->name('admin.critiques.unarchive');
-    Route::delete('/critiques/delete-archived/{id}', [AdminCritiqueController::class, 'deleteArchived'])->name('admin.critiques.delete.archived');
 });
