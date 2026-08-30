@@ -682,7 +682,7 @@
                     <div class="col-md-6 text-center text-md-end">
                         <p class="text-secondary mb-0" style="font-size: 0.85rem;">
                             <i class="fas fa-code text-primary me-1"></i>
-                            Made with <i class="fas fa-heart text-danger"></i> for better government
+                            made to make the government better
                         </p>
                     </div>
                 </div>

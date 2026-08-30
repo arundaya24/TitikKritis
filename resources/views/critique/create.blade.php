@@ -9,6 +9,13 @@
                     <i class="fas fa-pen me-2"></i> Kirim Kritik
                 </div>
                 <div class="card-body">
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
                     @if($errors->any())
                         <div class="alert alert-danger alert-dismissible fade show">
                             <ul class="mb-0">
@@ -22,6 +29,7 @@
 
                     <form method="POST" action="{{ route('critique.store') }}" enctype="multipart/form-data">
                         @csrf
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="government_level" class="form-label">Tingkat Pemerintahan <span class="text-danger">*</span></label>
@@ -112,7 +120,7 @@
                         <div class="mb-3">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="is_anonymous" name="is_anonymous"
-                                       {{ old('is_anonymous') ? 'checked' : '' }}>
+                                    {{ old('is_anonymous') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_anonymous">
                                     <i class="fas fa-user-secret"></i> Kirim secara anonim
                                 </label>
@@ -137,32 +145,32 @@
 
 @push('scripts')
 <script>
-$(document).ready(function() {
-    $('#province_id').change(function() {
-        var provinceId = $(this).val();
-        if (provinceId) {
-            $.get('/get-regencies-critique?province_id=' + provinceId, function(data) {
-                $('#regency_id').empty().append('<option value="">Pilih Kabupaten/Kota</option>');
-                $.each(data, function(key, value) {
-                    $('#regency_id').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+    $(document).ready(function() {
+        $('#province_id').change(function() {
+            var provinceId = $(this).val();
+            if (provinceId) {
+                $.get('/get-regencies-critique?province_id=' + provinceId, function(data) {
+                    $('#regency_id').empty().append('<option value="">Pilih Kabupaten/Kota</option>');
+                    $.each(data, function(key, value) {
+                        $('#regency_id').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                    });
+                    $('#district_id').empty().append('<option value="">Pilih Kecamatan</option>');
                 });
-                $('#district_id').empty().append('<option value="">Pilih Kecamatan</option>');
-            });
-        }
-    });
+            }
+        });
 
-    $('#regency_id').change(function() {
-        var regencyId = $(this).val();
-        if (regencyId) {
-            $.get('/get-districts-critique?regency_id=' + regencyId, function(data) {
-                $('#district_id').empty().append('<option value="">Pilih Kecamatan</option>');
-                $.each(data, function(key, value) {
-                    $('#district_id').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+        $('#regency_id').change(function() {
+            var regencyId = $(this).val();
+            if (regencyId) {
+                $.get('/get-districts-critique?regency_id=' + regencyId, function(data) {
+                    $('#district_id').empty().append('<option value="">Pilih Kecamatan</option>');
+                    $.each(data, function(key, value) {
+                        $('#district_id').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                    });
                 });
-            });
-        }
+            }
+        });
     });
-});
 </script>
 @endpush
 @endsection

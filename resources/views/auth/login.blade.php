@@ -115,7 +115,7 @@
             <div class="card-header">
                 <div class="logo"><i class="fas fa-exclamation-triangle"></i></div>
                 <h3>Titik Kritis</h3>
-                <p class="text-muted">Platform Kritik Masyarakat</p>
+                <p class="text-muted">Platform Kritik Pemerintah</p>
             </div>
             <div class="card-body">
                 @if (session('success'))

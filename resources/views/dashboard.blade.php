@@ -9,6 +9,7 @@
         </div>
     </div>
 
+    {{-- Stat Cards --}}
     <div class="row g-4">
         <div class="col-md-3">
             <div class="stat-card text-center">
@@ -40,6 +41,7 @@
         </div>
     </div>
 
+    {{-- Aksi Cepat --}}
     <div class="row mt-4">
         <div class="col-12">
             <div class="card">

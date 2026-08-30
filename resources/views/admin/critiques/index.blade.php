@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="card">
+<div class="card" style="border-radius: 0px;">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="fas fa-list me-2"></i> Daftar Kritik</span>
         <span class="badge bg-primary">{{ $critiques->total() }} Total</span>

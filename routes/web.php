@@ -93,7 +93,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
-    // ===== TAMBAHKAN INI =====
     Route::put('/users/demote/{id}', [AdminUserController::class, 'demote'])->name('users.demote');
 });
 
@@ -111,7 +110,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 Route::middleware('auth')->group(function () {
-    // ... route yang sudah ada ...
 
     Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.delete.avatar');
 });

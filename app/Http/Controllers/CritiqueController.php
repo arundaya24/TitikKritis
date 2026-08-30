@@ -50,7 +50,6 @@ class CritiqueController extends Controller
                 ->withInput();
         }
 
-        // Ambil content dengan input()
         $content = $request->input('content');
 
         $badWords = $this->checkBadWords($content);
@@ -188,7 +187,6 @@ class CritiqueController extends Controller
                 ->withInput();
         }
 
-        // Ambil content dengan input()
         $content = $request->input('content');
 
         $badWords = $this->checkBadWords($content);

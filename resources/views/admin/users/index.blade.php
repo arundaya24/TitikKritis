@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="card">
+<div class="card" style="border-radius: 0px;">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="fas fa-users-cog me-2"></i> Kelola Admin</span>
         <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">
