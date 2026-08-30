@@ -71,12 +71,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/critiques/{id}/status', [AdminCritiqueController::class, 'updateStatus'])->name('critiques.status');
     Route::post('/critiques/{id}/respond', [AdminCritiqueController::class, 'respond'])->name('critiques.respond');
 
-    Route::delete('/critiques/force-delete/{id}', [AdminCritiqueController::class, 'forceDelete'])->name('admin.critiques.force.delete');
-    Route::put('/critiques/archive/{id}', [AdminCritiqueController::class, 'archive'])->name('admin.critiques.archive');
-    Route::put('/critiques/unarchive/{id}', [AdminCritiqueController::class, 'unarchive'])->name('admin.critiques.unarchive');
-    Route::delete('/critiques/delete-archived/{id}', [AdminCritiqueController::class, 'deleteArchived'])->name('admin.critiques.delete.archived');
+    Route::delete('/critiques/force-delete/{id}', [AdminCritiqueController::class, 'forceDelete'])->name('critiques.force.delete');
+    Route::put('/critiques/archive/{id}', [AdminCritiqueController::class, 'archive'])->name('critiques.archive');
+    Route::put('/critiques/unarchive/{id}', [AdminCritiqueController::class, 'unarchive'])->name('critiques.unarchive');
+    Route::delete('/critiques/delete-archived/{id}', [AdminCritiqueController::class, 'deleteArchived'])->name('critiques.delete.archived');
 
-    Route::get('/critiques/archived-list', [AdminCritiqueController::class, 'archiveIndex'])->name('critiques.archive');
+    Route::get('/critiques/archived-list', [AdminCritiqueController::class, 'archiveIndex'])->name('critiques.archive.list');
 
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');

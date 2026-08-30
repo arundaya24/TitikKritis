@@ -28,7 +28,7 @@
             Halaman ini menampilkan semua kritik yang sudah diarsipkan. Kritik arsip bisa <strong>dikembalikan</strong> atau <strong>dihapus permanen</strong>.
         </div>
 
-        <form method="GET" action="{{ route('critiques.archive') }}" class="mb-3">
+        <form method="GET" action="{{ route('admin.critiques.archive.list') }}" class="mb-3">
             <div class="row g-2">
                 <div class="col-md-3">
                     <select class="form-select" name="status">

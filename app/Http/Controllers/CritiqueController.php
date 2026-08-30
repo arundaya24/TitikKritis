@@ -18,13 +18,48 @@ class CritiqueController extends Controller
 {
     use AuthorizesRequests;
 
-    public function index()
+    public function index(Request $request)
     {
-        $critiques = Critique::where('user_id', Auth::id())
+        $query = Critique::where('user_id', Auth::id());
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->input('category'));
+        }
+
+        if ($request->filled('archived')) {
+            $query->where('is_archived', $request->input('archived'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('content', 'like', '%'.$search.'%');
+            });
+        }
+
+        $critiques = $query
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('critique.index', compact('critiques'));
+        $categories = Category::orderBy('name')->get();
+
+        $statuses = [
+            'dikirim',
+            'ditinjau',
+            'diproses',
+            'selesai',
+            'ditolak',
+        ];
+
+        return view(
+            'critique.index',
+            compact('critiques', 'categories', 'statuses')
+        );
     }
 
     public function create()
@@ -256,11 +291,17 @@ class CritiqueController extends Controller
 
     public function history()
     {
-        $critiques = Critique::where('user_id', Auth::id())
+        $activeCritiques = Critique::where('user_id', Auth::id())
+            ->where('is_archived', false)
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(10, ['*'], 'active_page');
 
-        return view('critique.history', compact('critiques'));
+        $archivedCritiques = Critique::where('user_id', Auth::id())
+            ->where('is_archived', true)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10, ['*'], 'archived_page');
+
+        return view('critique.history', compact('activeCritiques', 'archivedCritiques'));
     }
 
     protected function validateCritique(Request $request)

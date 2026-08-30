@@ -158,10 +158,6 @@
     <div class="tab-content" id="critiqueTabContent">
         {{-- TAB AKTIF --}}
         <div class="tab-pane fade show active" id="active" role="tabpanel">
-            @php
-                $activeCritiques = $critiques->filter(function($c) { return !$c->is_archived; });
-            @endphp
-
             @if($activeCritiques->count() > 0)
                 <div class="card">
                     <div class="card-body">
@@ -181,7 +177,7 @@
                                 <tbody>
                                     @foreach($activeCritiques as $index => $critique)
                                         <tr>
-                                            <td>{{ $critiques->firstItem() + $index }}</td>
+                                            <td>{{ $activeCritiques->firstItem() + $index }}</td>
                                             <td>{{ Str::limit($critique->title, 30) }}</td>
                                             <td>{{ $critique->category->name }}</td>
                                             <td><span class="text-capitalize">{{ $critique->government_level }}</span></td>
@@ -239,7 +235,7 @@
                             </table>
                         </div>
                         <div class="d-flex justify-content-center">
-                            {{ $critiques->links() }}
+                            {{ $activeCritiques->links() }}
                         </div>
                     </div>
                 </div>
@@ -259,10 +255,6 @@
 
         {{-- TAB ARSIP --}}
         <div class="tab-pane fade" id="archived" role="tabpanel">
-            @php
-                $archivedCritiques = $critiques->filter(function($c) { return $c->is_archived; });
-            @endphp
-
             @if($archivedCritiques->count() > 0)
                 <div class="card">
                     <div class="card-body">
@@ -282,7 +274,7 @@
                                 <tbody>
                                     @foreach($archivedCritiques as $index => $critique)
                                         <tr>
-                                            <td>{{ $critiques->firstItem() + $index }}</td>
+                                            <td>{{ $archivedCritiques->firstItem() + $index }}</td>
                                             <td>{{ Str::limit($critique->title, 30) }}</td>
                                             <td>{{ $critique->category->name }}</td>
                                             <td><span class="text-capitalize">{{ $critique->government_level }}</span></td>
@@ -322,7 +314,7 @@
                             </table>
                         </div>
                         <div class="d-flex justify-content-center">
-                            {{ $critiques->links() }}
+                            {{ $archivedCritiques->links() }}
                         </div>
                     </div>
                 </div>
