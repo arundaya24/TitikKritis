@@ -35,9 +35,8 @@ class AdminCritiqueController extends Controller
             $query->where('category_id', $request->input('category'));
         }
 
-        if ($request->filled('archived')) {
-            $query->where('is_archived', $request->input('archived'));
-        }
+        $archived = $request->input('archived', 0);
+        $query->where('is_archived', $archived);
 
         if ($request->filled('search')) {
             $search = $request->input('search');

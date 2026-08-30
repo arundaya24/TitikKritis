@@ -3,10 +3,13 @@
 @section('content')
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="fas fa-archive me-2"></i> Arsip Kritik</span>
-        <a href="{{ route('admin.critiques.index') }}" class="btn btn-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Kembali ke Daftar Kritik
-        </a>
+        <span><i class="fas fa-list me-2"></i> Daftar Kritik</span>
+        <div>
+            <a href="{{ route('critiques.archive') }}" class="btn btn-secondary btn-sm me-1">
+                <i class="fas fa-archive"></i> Lihat Arsip
+            </a>
+            <span class="badge bg-primary">{{ $critiques->total() }} Total</span>
+        </div>
     </div>
     <div class="card-body">
         @if(session('success'))
@@ -23,12 +26,7 @@
             </div>
         @endif
 
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle me-1"></i>
-            Halaman ini menampilkan semua kritik yang sudah diarsipkan. Kritik arsip bisa <strong>dikembalikan</strong> atau <strong>dihapus permanen</strong>.
-        </div>
-
-        <form method="GET" action="{{ route('admin.critiques.archive.list') }}" class="mb-3">
+        <form method="GET" action="{{ route('admin.critiques.index') }}" class="mb-3">
             <div class="row g-2">
                 <div class="col-md-3">
                     <select class="form-select" name="status">
@@ -50,7 +48,14 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
+                    <select class="form-select" name="archived">
+                        <option value="0" {{ request('archived', 0) == '0' ? 'selected' : '' }}>Aktif</option>
+                        <option value="1" {{ request('archived') == '1' ? 'selected' : '' }}>Arsip</option>
+                        <option value="" {{ request('archived') === '' ? 'selected' : '' }}>Semua</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
                     <input type="text" class="form-control" name="search" placeholder="Cari judul/konten..." value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
@@ -72,7 +77,8 @@
                             <th>Kategori</th>
                             <th>Tingkat</th>
                             <th>Status</th>
-                            <th>Tanggal Arsip</th>
+                            <th>Arsip</th>
+                            <th>Tanggal</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -89,29 +95,58 @@
                                         {{ ucfirst($critique->status) }}
                                     </span>
                                 </td>
-                                <td>{{ $critique->updated_at->format('d/m/Y H:i') }}</td>
+                                <td>
+                                    @if($critique->is_archived)
+                                        <span class="badge bg-secondary">📦 Arsip</span>
+                                    @else
+                                        <span class="badge bg-success">Aktif</span>
+                                    @endif
+                                </td>
+                                <td>{{ $critique->submitted_at->format('d/m/Y H:i') }}</td>
                                 <td>
                                     <div class="d-flex gap-1 flex-wrap">
                                         <a href="{{ route('admin.critiques.show', $critique->id) }}" class="btn btn-sm btn-info">
                                             <i class="fas fa-eye"></i>
                                         </a>
 
-                                        <form action="{{ route('admin.critiques.unarchive', $critique->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="btn btn-sm btn-warning">
-                                                <i class="fas fa-undo"></i> Kembalikan
-                                            </button>
-                                        </form>
+                                        @if($critique->status === 'ditolak' && !$critique->is_archived)
+                                            <form action="{{ route('admin.critiques.force.delete', $critique->id) }}" method="POST" class="d-inline"
+                                                  onsubmit="return confirm('Hapus kritik yang ditolak ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i> Hapus
+                                                </button>
+                                            </form>
+                                        @endif
 
-                                        <form action="{{ route('admin.critiques.delete.archived', $critique->id) }}" method="POST" class="d-inline"
-                                              onsubmit="return confirm('Hapus kritik dari arsip permanen?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                <i class="fas fa-trash"></i> Hapus
-                                            </button>
-                                        </form>
+                                        @if($critique->status === 'selesai' && !$critique->is_archived)
+                                            <form action="{{ route('admin.critiques.archive', $critique->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit" class="btn btn-sm btn-secondary">
+                                                    <i class="fas fa-archive"></i> Arsip
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        @if($critique->is_archived)
+                                            <form action="{{ route('admin.critiques.unarchive', $critique->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit" class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-undo"></i> Kembalikan
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('admin.critiques.delete.archived', $critique->id) }}" method="POST" class="d-inline"
+                                                  onsubmit="return confirm('Hapus kritik dari arsip?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i> Hapus
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -124,12 +159,9 @@
             </div>
         @else
             <div class="text-center py-5">
-                <i class="fas fa-archive fa-3x text-muted mb-3"></i>
-                <h5>Arsip Kosong</h5>
-                <p class="text-muted">Belum ada kritik yang diarsipkan.</p>
-                <a href="{{ route('admin.critiques.index') }}" class="btn btn-primary">
-                    <i class="fas fa-list"></i> Kembali ke Daftar Kritik
-                </a>
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5>Belum Ada Kritik</h5>
+                <p class="text-muted">Tidak ada kritik yang masuk.</p>
             </div>
         @endif
     </div>

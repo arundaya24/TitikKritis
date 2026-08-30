@@ -5,7 +5,7 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="fas fa-list me-2"></i> Daftar Kritik</span>
         <div>
-            <a href="{{ route('admin.critiques.archive.list') }}" class="btn btn-secondary btn-sm me-1">
+            <a href="{{ route('critiques.archive') }}" class="btn btn-secondary btn-sm me-1">
                 <i class="fas fa-archive"></i> Lihat Arsip
             </a>
             <span class="badge bg-primary">{{ $critiques->total() }} Total</span>
@@ -50,9 +50,9 @@
                 </div>
                 <div class="col-md-2">
                     <select class="form-select" name="archived">
-                        <option value="">Semua</option>
-                        <option value="0" {{ request('archived') == '0' ? 'selected' : '' }}>Aktif</option>
+                        <option value="0" {{ request('archived', 0) == '0' ? 'selected' : '' }}>Aktif</option>
                         <option value="1" {{ request('archived') == '1' ? 'selected' : '' }}>Arsip</option>
+                        <option value="" {{ request('archived') === '' ? 'selected' : '' }}>Semua</option>
                     </select>
                 </div>
                 <div class="col-md-2">
