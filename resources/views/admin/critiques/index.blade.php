@@ -5,7 +5,7 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="fas fa-list me-2"></i> Daftar Kritik</span>
         <div>
-            <a href="{{ route('critiques.archive') }}" class="btn btn-secondary btn-sm me-1">
+            <a href="{{ route('admin.critiques.archive.index') }}" class="btn btn-secondary btn-sm me-1">
                 <i class="fas fa-archive"></i> Lihat Arsip
             </a>
             <span class="badge bg-primary">{{ $critiques->total() }} Total</span>

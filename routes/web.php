@@ -76,7 +76,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/critiques/unarchive/{id}', [AdminCritiqueController::class, 'unarchive'])->name('critiques.unarchive');
     Route::delete('/critiques/delete-archived/{id}', [AdminCritiqueController::class, 'deleteArchived'])->name('critiques.delete.archived');
 
-    Route::get('/critiques/archived-list', [AdminCritiqueController::class, 'archiveIndex'])->name('critiques.archive');
+    Route::get('/critiques/archived-list', [AdminCritiqueController::class, 'archiveIndex'])->name('critiques.archive.index');
 
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
