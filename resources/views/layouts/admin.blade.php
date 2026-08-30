@@ -597,8 +597,8 @@
                 <h5 class="mb-0"><i class="fas fa-dashboard"></i> {{ $title ?? 'Dashboard' }}</h5>
                 <div class="user-info">
                     {{-- NAMA BISA DIKLIK KE PROFILE --}}
-                    <a href="{{ route('profile.index') }}" class="text-decoration-none text-dark fw-semibold"
-                        style="font-size: 0.95rem;">
+                    <a href="{{ route('profile.index') }}" class="text-decoration-none fw-semibold"
+                        style="font-size: 0.95rem; color: inherit;">
                         {{ auth()->user()->name }}
                     </a>
                     {{-- AVATAR BISA DIKLIK KE PROFILE --}}

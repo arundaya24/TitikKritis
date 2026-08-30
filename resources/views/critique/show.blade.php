@@ -75,15 +75,6 @@
                         </div>
                     @endif
 
-                    @if($critique->admin_note)
-                        <div class="mb-3">
-                            <h5><i class="fas fa-sticky-note text-warning"></i> Catatan Admin</h5>
-                            <div class="p-3 bg-warning bg-opacity-10 rounded">
-                                {{ $critique->admin_note }}
-                            </div>
-                        </div>
-                    @endif
-
                     @if($critique->response)
                         <div class="mb-3">
                             <h5><i class="fas fa-reply text-success"></i> Tanggapan Admin</h5>

@@ -135,13 +135,12 @@ class AdminCritiqueController extends Controller
         );
     }
 
-    public function updateStatus(Request $request, $id)
+        public function updateStatus(Request $request, $id)
     {
         $critique = Critique::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
             'status' => 'required|in:dikirim,ditinjau,diproses,selesai,ditolak',
-            'admin_note' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -153,11 +152,9 @@ class AdminCritiqueController extends Controller
         $oldStatus = $critique->status;
 
         $newStatus = $request->input('status');
-        $adminNote = $request->input('admin_note');
 
         $critique->update([
             'status' => $newStatus,
-            'admin_note' => $adminNote,
         ]);
 
         CritiqueHistory::create([

@@ -80,15 +80,6 @@
                     </div>
                 @endif
 
-                @if($critique->admin_note)
-                    <div class="mb-3">
-                        <h5><i class="fas fa-sticky-note text-warning"></i> Catatan Admin</h5>
-                        <div class="p-3 bg-warning bg-opacity-10 rounded">
-                            {{ $critique->admin_note }}
-                        </div>
-                    </div>
-                @endif
-
                 @if($critique->response)
                     <div class="mb-3">
                         <h5><i class="fas fa-reply text-success"></i> Tanggapan Admin</h5>
@@ -141,46 +132,50 @@
                 @endif
 
                 <hr>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5><i class="fas fa-edit me-2"></i> Ubah Status</h5>
-                        <form method="POST" action="{{ route('admin.critiques.status', $critique->id) }}">
-                            @csrf
-                            @method('PUT')
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <select class="form-select" name="status" required>
-                                        @foreach($statuses as $status)
-                                            <option value="{{ $status }}" {{ $critique->status == $status ? 'selected' : '' }}>
-                                                {{ ucfirst($status) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                <div class="row align-items-stretch g-3">
+                    <div class="col-md-6 d-flex">
+                        <div class="border rounded p-3 w-100 d-flex flex-column">
+                            <h5><i class="fas fa-edit me-2"></i> Ubah Status</h5>
+                            <form method="POST" action="{{ route('admin.critiques.status', $critique->id) }}" class="mt-auto">
+                                @csrf
+                                @method('PUT')
+                                <div class="row g-2">
+                                    <div class="col-md-9">
+                                        <select class="form-select" name="status" required>
+                                            @foreach($statuses as $status)
+                                                <option value="{{ $status }}" {{ $critique->status == $status ? 'selected' : '' }}>
+                                                    {{ ucfirst($status) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="submit" class="btn btn-primary w-100 h-100">
+                                            <i class="fas fa-save"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        <i class="fas fa-save"></i> Update Status
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <h5><i class="fas fa-reply me-2"></i> Tanggapan</h5>
-                        <form method="POST" action="{{ route('admin.critiques.respond', $critique->id) }}">
-                            @csrf
-                            <div class="row g-2">
-                                <div class="col-md-10">
-                                    <textarea class="form-control" name="content" rows="2" placeholder="Tulis tanggapan..." required>{{ $critique->response?->content }}</textarea>
+                    <div class="col-md-6 d-flex">
+                        <div class="border rounded p-3 w-100 d-flex flex-column">
+                            <h5><i class="fas fa-reply me-2"></i> Tanggapan</h5>
+                            <form method="POST" action="{{ route('admin.critiques.respond', $critique->id) }}" class="mt-auto">
+                                @csrf
+                                <div class="row g-2">
+                                    <div class="col-md-9">
+                                        <textarea class="form-control" name="content" rows="2" placeholder="Tulis tanggapan..." required>{{ $critique->response?->content }}</textarea>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="submit" class="btn btn-success w-100 h-100">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <button type="submit" class="btn btn-success w-100" style="height: 100%;">
-                                        <i class="fas fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
 

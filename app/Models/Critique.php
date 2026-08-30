@@ -22,7 +22,6 @@ class Critique extends Model
         'is_anonymous',
         'status',
         'is_archived',
-        'admin_note',
         'submitted_at',
     ];
 
@@ -75,6 +74,7 @@ class Critique extends Model
         if ($this->is_anonymous) {
             return 'Anonim';
         }
+
         return $this->user->name;
     }
 
@@ -83,6 +83,7 @@ class Critique extends Model
         if ($this->is_anonymous) {
             return 'anonim';
         }
+
         return $this->user->username;
     }
 
