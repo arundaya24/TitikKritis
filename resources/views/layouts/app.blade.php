@@ -281,6 +281,34 @@
             background-color: #16213e !important;
         }
 
+        /* ===== DARK MODE - TAB (nav-tabs) ===== */
+        body.dark-mode .nav-tabs {
+            background-color: transparent !important;
+            border-bottom-color: #1a3a5c !important;
+        }
+
+        body.dark-mode .nav-tabs .nav-link {
+            color: #b0b0b0 !important;
+            background-color: transparent !important;
+            border-color: transparent !important;
+        }
+
+        body.dark-mode .nav-tabs .nav-link:hover {
+            color: #e0e0e0 !important;
+            background-color: #16213e !important;
+            border-color: #1a3a5c !important;
+        }
+
+        body.dark-mode .nav-tabs .nav-link.active {
+            color: #4fc3f7 !important;
+            background-color: #16213e !important;
+            border-color: #1a3a5c #1a3a5c #16213e !important;
+        }
+
+        body.dark-mode .tab-content {
+            background-color: transparent !important;
+        }
+
         body.dark-mode .form-control,
         body.dark-mode .form-select {
             background-color: #0d1b2a !important;

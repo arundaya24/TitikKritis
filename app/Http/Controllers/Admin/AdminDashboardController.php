@@ -7,11 +7,9 @@ use App\Models\Critique;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AdminDashboardController extends Controller
 {
-    use AuthorizesRequests;
     public function index()
     {
         $totalCritiques = Critique::count();
@@ -23,6 +21,7 @@ class AdminDashboardController extends Controller
 
         $totalUsers = User::where('role', 'user')->count();
         $totalAdmins = User::where('role', 'admin')->count();
+        $totalSuperAdmins = User::where('role', 'super_admin')->count();
 
         $statusCounts = Critique::select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
@@ -41,11 +40,16 @@ class AdminDashboardController extends Controller
             ->limit(10)
             ->get();
 
-        $monthlyCritiques = Critique::select(DB::raw('MONTH(submitted_at) as month'), DB::raw('YEAR(submitted_at) as year'), DB::raw('count(*) as total'))
+        // ===== TREND 6 BULAN TERAKHIR (MULAI DARI BULAN INI) =====
+        $monthlyCritiques = Critique::select(
+                DB::raw('MONTH(submitted_at) as month'),
+                DB::raw('YEAR(submitted_at) as year'),
+                DB::raw('count(*) as total')
+            )
+            ->where('submitted_at', '>=', now()->subMonths(5)->startOfMonth())
             ->groupBy('year', 'month')
-            ->orderBy('year', 'desc')
-            ->orderBy('month', 'desc')
-            ->limit(6)
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
             ->get();
 
         return view('admin.dashboard', compact(
@@ -57,6 +61,7 @@ class AdminDashboardController extends Controller
             'rejectedCritiques',
             'totalUsers',
             'totalAdmins',
+            'totalSuperAdmins',
             'statusCounts',
             'categoryStats',
             'recentCritiques',

@@ -15,13 +15,15 @@ class AdminUserController extends Controller
 {
     public function index()
     {
-        // Tampilkan semua admin dan super_admin
         $admins = User::whereIn('role', ['admin', 'super_admin'])
             ->orderByRaw("FIELD(role, 'super_admin', 'admin')")
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('admin.users.index', compact('admins'));
+        $totalAdmins = User::where('role', 'admin')->count();
+        $totalSuperAdmins = User::where('role', 'super_admin')->count();
+
+        return view('admin.users.index', compact('admins', 'totalAdmins', 'totalSuperAdmins'));
     }
 
     public function create()

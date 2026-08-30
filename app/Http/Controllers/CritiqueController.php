@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Critique;
 use App\Models\Category;
+use App\Models\Critique;
+use App\Models\CritiqueHistory;
+use App\Models\District;
 use App\Models\Province;
 use App\Models\Regency;
-use App\Models\District;
-use App\Models\CritiqueHistory;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CritiqueController extends Controller
 {
@@ -54,11 +54,11 @@ class CritiqueController extends Controller
 
         $badWords = $this->checkBadWords($content);
 
-        if (!empty($badWords)) {
+        if (! empty($badWords)) {
             return redirect()->back()
                 ->withErrors([
                     'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '
-                        . implode(', ', $badWords)
+                        .implode(', ', $badWords),
                 ])
                 ->withInput();
         }
@@ -107,7 +107,7 @@ class CritiqueController extends Controller
             'regency',
             'district',
             'histories',
-            'response'
+            'response',
         ])
             ->where('user_id', Auth::id())
             ->findOrFail($id);
@@ -191,11 +191,11 @@ class CritiqueController extends Controller
 
         $badWords = $this->checkBadWords($content);
 
-        if (!empty($badWords)) {
+        if (! empty($badWords)) {
             return redirect()->back()
                 ->withErrors([
                     'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '
-                        . implode(', ', $badWords)
+                        .implode(', ', $badWords),
                 ])
                 ->withInput();
         }
@@ -288,7 +288,27 @@ class CritiqueController extends Controller
             'sialan',
             'tolol',
             'bego',
-            'goblog'
+            'goblog',
+            'kontol',
+            'memek',
+            'ngentot',
+            'tai',
+            'monyet',
+            'babi',
+            'goblok',
+            'idiot',
+            'dongo',
+            'asu',
+            'ngewe',
+            'bodoh',
+            'berak',
+            'titit',
+            'pantat',
+            'bool',
+            'kampang',
+            'fuck',
+            'shit',
+            'goddamn',
         ];
 
         $found = [];
@@ -324,5 +344,67 @@ class CritiqueController extends Controller
             ->get();
 
         return response()->json($districts);
+    }
+
+    // ===== HAPUS KRITIK YANG DITOLAK =====
+    public function forceDelete($id)
+    {
+        $critique = Critique::where('user_id', Auth::id())
+            ->where('status', 'ditolak')
+            ->findOrFail($id);
+
+        if ($critique->image) {
+            Storage::disk('public')->delete($critique->image);
+        }
+
+        $critique->delete();
+
+        return redirect()->route('critique.history')
+            ->with('success', 'Kritik yang ditolak berhasil dihapus!');
+    }
+
+    // ===== ARSIP KRITIK YANG SELESAI =====
+    public function archive($id)
+    {
+        $critique = Critique::where('user_id', Auth::id())
+            ->where('status', 'selesai')
+            ->findOrFail($id);
+
+        $critique->is_archived = true;
+        $critique->save();
+
+        return redirect()->route('critique.history')
+            ->with('success', 'Kritik berhasil diarsipkan!');
+    }
+
+    // ===== KEMBALIKAN DARI ARSIP =====
+    public function unarchive($id)
+    {
+        $critique = Critique::where('user_id', Auth::id())
+            ->where('is_archived', true)
+            ->findOrFail($id);
+
+        $critique->is_archived = false;
+        $critique->save();
+
+        return redirect()->route('critique.history')
+            ->with('success', 'Kritik berhasil dikembalikan dari arsip!');
+    }
+
+    // ===== HAPUS DARI ARSIP =====
+    public function deleteArchived($id)
+    {
+        $critique = Critique::where('user_id', Auth::id())
+            ->where('is_archived', true)
+            ->findOrFail($id);
+
+        if ($critique->image) {
+            Storage::disk('public')->delete($critique->image);
+        }
+
+        $critique->delete();
+
+        return redirect()->route('critique.history')
+            ->with('success', 'Kritik arsip berhasil dihapus!');
     }
 }

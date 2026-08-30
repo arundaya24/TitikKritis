@@ -11,17 +11,14 @@ class AdminUserManagementController extends Controller
 {
     public function index()
     {
-        // HANYA TAMPILKAN USER DENGAN ROLE 'user' (BUKAN ADMIN)
         $users = User::where('role', 'user')
-            ->withCount(['critiques' => function ($query) {
-                $query->whereNotNull('submitted_at');
-            }])
+            ->withCount(['critiques'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
         $totalUsers = User::where('role', 'user')->count();
-        $totalAdmins = User::whereIn('role', ['admin', 'super_admin'])->count();
-        $totalUsersRole = User::where('role', 'user')->count();
+        $totalAdmins = User::where('role', 'admin')->count();
+        $totalSuperAdmins = User::where('role', 'super_admin')->count();
         $totalCritiques = Critique::count();
         $activeUsers = User::where('role', 'user')->whereHas('critiques')->count();
 
@@ -29,7 +26,7 @@ class AdminUserManagementController extends Controller
             'users',
             'totalUsers',
             'totalAdmins',
-            'totalUsersRole',
+            'totalSuperAdmins', // TAMBAHKAN INI
             'totalCritiques',
             'activeUsers'
         ));

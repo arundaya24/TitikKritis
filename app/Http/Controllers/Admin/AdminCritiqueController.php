@@ -3,18 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Critique;
 use App\Models\CritiqueHistory;
-use App\Models\Category;
 use App\Models\Response;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AdminCritiqueController extends Controller
 {
     use AuthorizesRequests;
+
     public function index(Request $request)
     {
         $query = Critique::with([
@@ -40,8 +41,8 @@ class AdminCritiqueController extends Controller
             $search = $request->input('search');
 
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('content', 'like', '%' . $search . '%');
+                $q->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('content', 'like', '%'.$search.'%');
             });
         }
 
@@ -158,5 +159,53 @@ class AdminCritiqueController extends Controller
         return redirect()
             ->route('admin.critiques.show', $critique->id)
             ->with('success', 'Tanggapan berhasil dikirim!');
+    }
+
+    public function forceDelete($id)
+    {
+        $critique = Critique::where('status', 'ditolak')->findOrFail($id);
+
+        if ($critique->image) {
+            Storage::disk('public')->delete($critique->image);
+        }
+
+        $critique->delete();
+
+        return redirect()->route('admin.critiques.index')
+            ->with('success', 'Kritik yang ditolak berhasil dihapus!');
+    }
+
+    public function archive($id)
+    {
+        $critique = Critique::where('status', 'selesai')->findOrFail($id);
+        $critique->is_archived = true;
+        $critique->save();
+
+        return redirect()->route('admin.critiques.index')
+            ->with('success', 'Kritik berhasil diarsipkan!');
+    }
+
+    public function unarchive($id)
+    {
+        $critique = Critique::where('is_archived', true)->findOrFail($id);
+        $critique->is_archived = false;
+        $critique->save();
+
+        return redirect()->route('admin.critiques.index')
+            ->with('success', 'Kritik berhasil dikembalikan dari arsip!');
+    }
+
+    public function deleteArchived($id)
+    {
+        $critique = Critique::where('is_archived', true)->findOrFail($id);
+
+        if ($critique->image) {
+            Storage::disk('public')->delete($critique->image);
+        }
+
+        $critique->delete();
+
+        return redirect()->route('admin.critiques.index')
+            ->with('success', 'Kritik arsip berhasil dihapus!');
     }
 }

@@ -1,20 +1,19 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\PasswordResetController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\CritiqueController;
-use App\Http\Controllers\StatisticController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminCritiqueController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminUserManagementController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CritiqueController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StatisticController;
+use Illuminate\Support\Facades\Route;
 
-// ============ PUBLIC / GUEST ROUTES ============
 Route::get('/get-regencies', [RegisterController::class, 'getRegencies'])->name('get.regencies');
 Route::get('/get-districts', [RegisterController::class, 'getDistricts'])->name('get.districts');
 
@@ -27,16 +26,13 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 
-    // ============ LUPA PASSWORD ============
     Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
     Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
     Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
 });
 
-// ============ USER ROUTES (AUTH) ============
 Route::middleware('auth')->group(function () {
-    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -47,6 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.delete.avatar');
 
     Route::get('/critique', [CritiqueController::class, 'index'])->name('critique.index');
     Route::get('/critique/history', [CritiqueController::class, 'history'])->name('critique.history');
@@ -59,57 +56,37 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get-regencies-critique', [CritiqueController::class, 'getRegencies'])->name('get.regencies.critique');
     Route::get('/get-districts-critique', [CritiqueController::class, 'getDistricts'])->name('get.districts.critique');
+
+    // ===== FITUR USER =====
+    Route::delete('/critique/force-delete/{id}', [CritiqueController::class, 'forceDelete'])->name('critique.force.delete');
+    Route::put('/critique/archive/{id}', [CritiqueController::class, 'archive'])->name('critique.archive');
+    Route::put('/critique/unarchive/{id}', [CritiqueController::class, 'unarchive'])->name('critique.unarchive');
+    Route::delete('/critique/delete-archived/{id}', [CritiqueController::class, 'deleteArchived'])->name('critique.delete.archived');
 });
 
-// ============ ADMIN ROUTES ============
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard Admin
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    // Manajemen Kritik (Admin)
     Route::get('/critiques', [AdminCritiqueController::class, 'index'])->name('critiques.index');
     Route::get('/critiques/{id}', [AdminCritiqueController::class, 'show'])->name('critiques.show');
     Route::put('/critiques/{id}/status', [AdminCritiqueController::class, 'updateStatus'])->name('critiques.status');
     Route::post('/critiques/{id}/respond', [AdminCritiqueController::class, 'respond'])->name('critiques.respond');
 
-    // Kelola Admin (Buat Admin Baru)
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
     Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    Route::put('/users/demote/{id}', [AdminUserController::class, 'demote'])->name('users.demote');
+    Route::put('/users/promote/{id}', [AdminUserController::class, 'promote'])->name('users.promote');
 
-    // Manajemen User (Lihat & Hapus Semua User)
     Route::get('/users/manage', [AdminUserManagementController::class, 'index'])->name('users.manage');
     Route::get('/users/detail/{id}', [AdminUserManagementController::class, 'show'])->name('users.detail');
     Route::delete('/users/delete/{id}', [AdminUserManagementController::class, 'destroy'])->name('users.delete');
     Route::get('/users/toggle/{id}', [AdminUserManagementController::class, 'toggleAdmin'])->name('users.toggle');
-});
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // ... route yang sudah ada ...
-
-    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
-    Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
-    Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
-    Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
-
-    Route::put('/users/demote/{id}', [AdminUserController::class, 'demote'])->name('users.demote');
-});
-
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // ... route yang sudah ada ...
-
-    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
-    Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
-    Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
-    Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
-    Route::put('/users/demote/{id}', [AdminUserController::class, 'demote'])->name('users.demote');
-
-    // ===== TAMBAHKAN INI =====
-    Route::put('/users/promote/{id}', [AdminUserController::class, 'promote'])->name('users.promote');
-});
-
-Route::middleware('auth')->group(function () {
-
-    Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.delete.avatar');
+    // ===== FITUR ADMIN =====
+    Route::delete('/critiques/force-delete/{id}', [AdminCritiqueController::class, 'forceDelete'])->name('admin.critiques.force.delete');
+    Route::put('/critiques/archive/{id}', [AdminCritiqueController::class, 'archive'])->name('admin.critiques.archive');
+    Route::put('/critiques/unarchive/{id}', [AdminCritiqueController::class, 'unarchive'])->name('admin.critiques.unarchive');
+    Route::delete('/critiques/delete-archived/{id}', [AdminCritiqueController::class, 'deleteArchived'])->name('admin.critiques.delete.archived');
 });
