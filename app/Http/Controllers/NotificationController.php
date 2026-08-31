@@ -34,4 +34,25 @@ class NotificationController extends Controller
 
         return redirect()->back();
     }
+
+    /**
+     * Hapus satu notifikasi.
+     */
+    public function destroy(string $id): RedirectResponse
+    {
+        $notification = Auth::user()->notifications()->findOrFail($id);
+        $notification->delete();
+
+        return redirect()->back();
+    }
+
+    /**
+     * Hapus semua notifikasi milik user yang login.
+     */
+    public function destroyAll(): RedirectResponse
+    {
+        Auth::user()->notifications()->delete();
+
+        return redirect()->back();
+    }
 }

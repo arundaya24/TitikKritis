@@ -596,6 +596,7 @@
             <div class="admin-header">
                 <h5 class="mb-0"><i class="fas fa-dashboard"></i> {{ $title ?? 'Dashboard' }}</h5>
                 <div class="user-info">
+                    @include('partials.notification-bell')
                     {{-- NAMA BISA DIKLIK KE PROFILE --}}
                     <a href="{{ route('profile.index') }}" class="text-decoration-none fw-semibold"
                         style="font-size: 0.95rem; color: inherit;">
