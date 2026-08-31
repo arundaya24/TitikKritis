@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Critique;
 use App\Models\CritiqueHistory;
 use App\Models\Response;
+use App\Notifications\CritiqueResponded;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -195,6 +196,10 @@ class AdminCritiqueController extends Controller
                 'content' => $content,
             ]
         );
+
+        if ($critique->user) {
+            $critique->user->notify(new CritiqueResponded($critique));
+        }
 
         return redirect()
             ->route('admin.critiques.show', $critique->id)

@@ -583,6 +583,9 @@
                                 <i class="fas fa-moon" id="userThemeIcon"></i>
                             </button>
                         </li>
+                        <li class="nav-item d-flex align-items-center">
+                            @include('partials.notification-bell')
+                        </li>
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"

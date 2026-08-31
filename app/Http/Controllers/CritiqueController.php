@@ -8,9 +8,12 @@ use App\Models\CritiqueHistory;
 use App\Models\District;
 use App\Models\Province;
 use App\Models\Regency;
+use App\Models\User;
+use App\Notifications\NewCritiqueSubmitted;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -127,6 +130,12 @@ class CritiqueController extends Controller
             'changed_by' => Auth::id(),
             'note' => 'Kritik dikirim oleh pengguna',
         ]);
+
+        $admins = User::whereIn('role', ['admin', 'super_admin'])->get();
+
+        if ($admins->isNotEmpty()) {
+            Notification::send($admins, new NewCritiqueSubmitted($critique));
+        }
 
         return redirect()
             ->route('critique.show', $critique->id)

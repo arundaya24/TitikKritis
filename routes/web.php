@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CritiqueController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatisticController;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +38,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read.all');
 
     Route::get('/statistic', [StatisticController::class, 'index'])->name('statistic.index');
 
