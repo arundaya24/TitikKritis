@@ -71,10 +71,15 @@ class CritiqueController extends Controller
         $provinces = Province::orderBy('name')->get();
         $user = Auth::user();
 
+        $recentCritiques = Critique::with(['user', 'category'])
+            ->orderBy('submitted_at', 'desc')
+            ->get();
+
         return view('critique.create', compact(
             'categories',
             'provinces',
-            'user'
+            'user',
+            'recentCritiques'
         ));
     }
 
