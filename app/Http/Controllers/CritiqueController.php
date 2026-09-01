@@ -323,7 +323,7 @@ class CritiqueController extends Controller
             'district_id' => 'nullable|exists:districts,id',
             'title' => 'required|string|max:255',
             'content' => 'required|string|min:10',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:10240',
         ]);
     }
 

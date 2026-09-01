@@ -112,9 +112,9 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="image" class="form-label">Foto Bukti</label>
-                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                            <small class="text-muted">Format: jpg, png, jpeg, gif. Maks: 2MB</small>
+                            <label for="image" class="form-label">Foto/Dokumen Bukti</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*,.pdf,application/pdf">
+                            <small class="text-muted">Format: jpg, png, jpeg, gif, pdf. Maks: 10MB</small>
                         </div>
 
                         <div class="mb-3">
@@ -174,3 +174,4 @@
 </script>
 @endpush
 @endsection
+

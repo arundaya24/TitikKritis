@@ -70,8 +70,14 @@
 
                     @if($critique->image)
                         <div class="mb-3">
-                            <h5>Foto Bukti</h5>
-                            <img src="{{ asset('storage/' . $critique->image) }}" alt="Foto Bukti" class="img-fluid rounded" style="max-height: 400px;">
+                            <h5>Foto/Dokumen Bukti</h5>
+                            @if(str_ends_with(strtolower($critique->image), '.pdf'))
+                                <a href="{{ asset('storage/' . $critique->image) }}" target="_blank" class="btn btn-outline-secondary">
+                                    <i class="fas fa-file-pdf"></i> Buka Dokumen PDF
+                                </a>
+                            @else
+                                <img src="{{ asset('storage/' . $critique->image) }}" alt="Foto Bukti" class="img-fluid rounded" style="max-height: 400px;">
+                            @endif
                         </div>
                     @endif
 

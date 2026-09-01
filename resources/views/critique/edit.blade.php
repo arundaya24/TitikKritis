@@ -91,14 +91,20 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="image" class="form-label">Foto Bukti</label>
+                            <label for="image" class="form-label">Foto/Dokumen Bukti</label>
                             @if($critique->image)
                                 <div class="mb-2">
-                                    <img src="{{ asset('storage/' . $critique->image) }}" alt="Foto Bukti" style="max-height: 100px;">
+                                    @if(str_ends_with(strtolower($critique->image), '.pdf'))
+                                        <a href="{{ asset('storage/' . $critique->image) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-file-pdf"></i> Lihat PDF saat ini
+                                        </a>
+                                    @else
+                                        <img src="{{ asset('storage/' . $critique->image) }}" alt="Foto Bukti" style="max-height: 100px;">
+                                    @endif
                                 </div>
                             @endif
-                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                            <small class="text-muted">Format: jpg, png, jpeg, gif. Maks: 2MB</small>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*,.pdf,application/pdf">
+                            <small class="text-muted">Format: jpg, png, jpeg, gif, pdf. Maks: 10MB</small>
                         </div>
 
                         <div class="mb-3">
