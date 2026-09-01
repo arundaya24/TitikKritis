@@ -2,28 +2,47 @@
 
 @section('content')
 <style>
-    #formCol,
-    #feedCol {
-        transition: flex-basis .35s ease, max-width .35s ease, opacity .3s ease, padding .35s ease, margin .35s ease;
-    }
-
-    #feedCol.feed-collapsed {
-        opacity: 0;
-        pointer-events: none;
-        overflow: hidden;
-    }
-
     @media (min-width: 992px) {
-        #feedCol.feed-collapsed {
-            flex-basis: 0% !important;
-            max-width: 0% !important;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
+        #critiqueRow {
+            position: relative; /* acuan posisi absolute #feedCol */
         }
 
-        #formCol.form-expanded {
-            flex-basis: 100% !important;
-            max-width: 100% !important;
+        /* Default: form FULL WIDTH (feed masih tersembunyi) */
+        #formCol {
+            flex: 0 0 100%;
+            max-width: 100%;
+            transition: flex-basis .45s cubic-bezier(.4,0,.2,1),
+                        max-width .45s cubic-bezier(.4,0,.2,1);
+        }
+
+        /* Saat feed dibuka, form menyempit jadi setara col-lg-7 */
+        #formCol.form-shrunk {
+            flex: 0 0 58.333333%;
+            max-width: 58.333333%;
+        }
+
+        /* #feedCol di luar alur flex (absolute), supaya TIDAK PERNAH
+           mempengaruhi tinggi #critiqueRow -> footer tidak ikut naik/turun */
+        #feedCol {
+            position: absolute;
+            top: 0;
+            right: 15px;
+            width: 0;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+            transition: width .45s cubic-bezier(.4,0,.2,1),
+                        opacity .3s ease;
+        }
+
+        #feedCol.feed-open {
+            width: 41.666667%;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #feedCol .feed-inner {
+            width: 100%; /* dioverride presisi via JS */
         }
     }
 
@@ -34,15 +53,24 @@
             max-width: 100%;
         }
 
-        #feedCol.feed-collapsed {
-            max-height: 0;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            margin-top: 0 !important;
+        #feedCol {
+            display: grid;
+            grid-template-rows: 0fr;
+            margin-top: 0;
+            transition: grid-template-rows .4s cubic-bezier(.4,0,.2,1),
+                        opacity .3s ease,
+                        margin-top .4s ease;
+            opacity: 0;
         }
 
-        #feedCol:not(.feed-collapsed) {
-            max-height: 2000px;
+        #feedCol .feed-inner {
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        #feedCol.feed-open {
+            grid-template-rows: 1fr;
+            opacity: 1;
             margin-top: 1rem;
         }
     }
@@ -53,8 +81,8 @@
             <i class="fas fa-eye"></i> Tampilkan Kritik Warga
         </button>
     </div>
-    <div class="row">
-        <div class="col-lg-7 form-expanded" id="formCol">
+    <div class="row" id="critiqueRow">
+        <div class="col-lg-7" id="formCol">
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-pen me-2"></i> Kirim Kritik
@@ -192,34 +220,36 @@
             </div>
         </div>
 
-        <div class="col-lg-5 feed-collapsed" id="feedCol">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-stream me-2"></i> Semua Kritik Warga
-                </div>
-                <div class="card-body" style="max-height: 720px; overflow-y: auto;">
-                    @forelse($recentCritiques as $recent)
-                        <div class="border-bottom pb-2 mb-2">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <h6 class="mb-1">{{ $recent->title }}</h6>
-                                <span class="badge badge-status badge-{{ $recent->status }} ms-2">
-                                    {{ ucfirst($recent->status) }}
-                                </span>
+        <div class="col-lg-5" id="feedCol">
+            <div class="feed-inner">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-stream me-2"></i> Semua Kritik Warga
+                    </div>
+                    <div class="card-body" style="max-height: 740px; overflow-y: auto;">
+                        @forelse($recentCritiques as $recent)
+                            <div class="border-bottom pb-2 mb-2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h6 class="mb-1">{{ $recent->title }}</h6>
+                                    <span class="badge badge-status badge-{{ $recent->status }} ms-2">
+                                        {{ ucfirst($recent->status) }}
+                                    </span>
+                                </div>
+                                <p class="mb-1 small">
+                                    {!! nl2br(e($recent->content)) !!}
+                                </p>
+                                <div class="small text-muted">
+                                    <i class="fas fa-user"></i> {{ $recent->submitter_name }}
+                                    &middot;
+                                    <i class="fas fa-tag"></i> {{ $recent->category->name }}
+                                    &middot;
+                                    {{ $recent->submitted_at->diffForHumans() }}
+                                </div>
                             </div>
-                            <p class="mb-1 small">
-                                {!! nl2br(e($recent->content)) !!}
-                            </p>
-                            <div class="small text-muted">
-                                <i class="fas fa-user"></i> {{ $recent->submitter_name }}
-                                &middot;
-                                <i class="fas fa-tag"></i> {{ $recent->category->name }}
-                                &middot;
-                                {{ $recent->submitted_at->diffForHumans() }}
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-muted mb-0">Belum ada kritik dari warga lain.</p>
-                    @endforelse
+                        @empty
+                            <p class="text-muted mb-0">Belum ada kritik dari warga lain.</p>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
@@ -254,15 +284,35 @@
             }
         });
 
-        $('#toggleFeedBtn').click(function() {
-            $('#feedCol').toggleClass('feed-collapsed');
-            $('#formCol').toggleClass('form-expanded');
-
-            if ($('#feedCol').hasClass('feed-collapsed')) {
-                $(this).html('<i class="fas fa-eye"></i> Tampilkan Kritik Warga');
-            } else {
-                $(this).html('<i class="fas fa-eye-slash"></i> Sembunyikan Kritik Warga');
+        // Pin lebar konten kartu feed (px) supaya teks di dalamnya
+        // tidak reflow selama #feedCol melebar/menyempit.
+        function pinFeedInnerWidth() {
+            if ($(window).width() < 992) {
+                $('#feedCol .feed-inner').css('width', '');
+                return;
             }
+            var rowWidth = $('#critiqueRow').width();
+            var expandedWidth = (rowWidth * (5 / 12)) - 15; // setara col-lg-5 dikurangi padding
+            $('#feedCol .feed-inner').css('width', expandedWidth + 'px');
+        }
+
+        pinFeedInnerWidth();
+        $(window).on('resize', pinFeedInnerWidth);
+
+        $('#toggleFeedBtn').click(function() {
+            var $feed = $('#feedCol');
+            var $form = $('#formCol');
+            var $btn = $(this);
+            var opening = !$feed.hasClass('feed-open');
+
+            pinFeedInnerWidth();
+
+            $feed.toggleClass('feed-open', opening);
+            $form.toggleClass('form-shrunk', opening);
+
+            $btn.html(opening
+                ? '<i class="fas fa-eye-slash"></i> Sembunyikan Kritik Warga'
+                : '<i class="fas fa-eye"></i> Tampilkan Kritik Warga');
         });
     });
 </script>
