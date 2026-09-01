@@ -34,6 +34,11 @@ class Critique extends Model
         ];
     }
 
+    public function updates()
+    {
+        return $this->hasMany(CritiqueUpdate::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
