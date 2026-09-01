@@ -621,7 +621,7 @@
         @yield('content')
     </main>
 
-    @if (!auth()->user()?->isAdmin())
+    @if (auth()->check() && !auth()->user()->isAdmin())
         <footer class="footer">
             <div class="container">
                 <div class="row">
