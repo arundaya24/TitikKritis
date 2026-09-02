@@ -6,10 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Critique;
 use App\Models\CritiqueHistory;
-use App\Models\CritiqueUpdate;
 use App\Models\Response;
 use App\Notifications\CritiqueResponded;
-use App\Notifications\CritiqueStatusUpdated;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -144,8 +142,6 @@ class AdminCritiqueController extends Controller
 
         $validator = Validator::make($request->all(), [
             'status' => 'required|in:dikirim,ditinjau,diproses,selesai,ditolak',
-            'files' => 'required|array|min:1',
-            'files.*' => 'file|mimes:jpg,jpeg,png,webp,pdf,doc,docx|max:10240',
         ]);
 
         if ($validator->fails()) {
@@ -157,27 +153,18 @@ class AdminCritiqueController extends Controller
         $oldStatus = $critique->status;
         $newStatus = $request->input('status');
 
-        // Jangan bikin update kalau status sebenarnya sama
         if ($oldStatus === $newStatus) {
-            return redirect()->back()
-                ->with('error', 'Status belum berubah.');
+            return redirect()
+                ->route('admin.critiques.show', $critique->id)
+                ->with('error', 'Status tidak berubah.');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Update status
-        |--------------------------------------------------------------------------
-        */
+        $isClosed = in_array($newStatus, ['selesai', 'ditolak']);
 
         $critique->update([
             'status' => $newStatus,
+            'user_can_reply' => ! $isClosed,
         ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Simpan history
-        |--------------------------------------------------------------------------
-        */
 
         CritiqueHistory::create([
             'critique_id' => $critique->id,
@@ -187,58 +174,9 @@ class AdminCritiqueController extends Controller
             'note' => 'Status diubah oleh admin',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Simpan update status
-        |--------------------------------------------------------------------------
-        */
-
-        $update = CritiqueUpdate::create([
-            'critique_id' => $critique->id,
-            'user_id' => Auth::id(),
-            'old_status' => $oldStatus,
-            'new_status' => $newStatus,
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Simpan bukti
-        |--------------------------------------------------------------------------
-        */
-
-        foreach ($request->file('files') as $file) {
-
-            $path = $file->store(
-                'critique_updates',
-                'public'
-            );
-
-            $update->files()->create([
-                'file_path' => $path,
-                'original_name' => $file->getClientOriginalName(),
-                'file_type' => $file->getClientMimeType(),
-            ]);
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Notification ke user
-        |--------------------------------------------------------------------------
-        */
-
-        if ($critique->user) {
-            $critique->user->notify(
-                new CritiqueStatusUpdated(
-                    $critique,
-                    $oldStatus,
-                    $newStatus
-                )
-            );
-        }
-
         return redirect()
             ->route('admin.critiques.show', $critique->id)
-            ->with('success', 'Status dan bukti berhasil dikirim ke pengguna.');
+            ->with('success', 'Status kritik berhasil diperbarui!');
     }
 
     public function respond(Request $request, $id)

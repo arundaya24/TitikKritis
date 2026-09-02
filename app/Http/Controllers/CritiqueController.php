@@ -238,6 +238,7 @@ class CritiqueController extends Controller
             'district',
             'histories',
             'response',
+            'messages.user',
             'updates.files',
             'updates.user',
         ])
@@ -558,6 +559,13 @@ class CritiqueController extends Controller
             );
         }
 
+        if (! $critique->user_can_reply) {
+            return back()->with(
+                'error',
+                'Anda belum dapat membalas laporan ini. Tunggu perubahan status dari admin.'
+            );
+        }
+
         $request->validate([
             'message' => 'required|string|min:1|max:5000',
         ]);
@@ -565,6 +573,10 @@ class CritiqueController extends Controller
         $critique->messages()->create([
             'user_id' => Auth::id(),
             'message' => $request->message,
+        ]);
+
+        $critique->update([
+            'user_can_reply' => false,
         ]);
 
         return back()->with(

@@ -282,6 +282,46 @@
                             </div>
                         @endif
 
+                        @if ($critique->status === 'selesai' || $critique->status === 'ditolak')
+                            <div class="alert alert-secondary">
+                                <i class="bi bi-lock"></i>
+                                Laporan ini sudah ditutup. Anda tidak dapat membalas lagi.
+                            </div>
+                        @elseif($critique->user_can_reply)
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        Balas Laporan
+                                    </h5>
+
+                                    <p class="text-muted">
+                                        Admin telah mengubah status laporan Anda.
+                                        Anda dapat memberikan balasan jika diperlukan.
+                                    </p>
+
+                                    <form action="{{ route('critique.message', $critique->id) }}" method="POST">
+                                        @csrf
+
+                                        <div class="mb-3">
+                                            <textarea name="message" class="form-control" rows="4" placeholder="Tulis balasan Anda..." required
+                                                maxlength="5000"></textarea>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-send"></i>
+                                            Kirim Balasan
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @else
+                            <div class="alert alert-info mt-4">
+                                <i class="bi bi-info-circle"></i>
+                                Anda belum dapat membalas laporan ini.
+                                Balasan akan tersedia kembali setelah admin mengubah status laporan.
+                            </div>
+                        @endif
+
                         {{-- RIWAYAT STATUS --}}
                         @if ($critique->histories->count() > 0)
                             <div class="mb-4">

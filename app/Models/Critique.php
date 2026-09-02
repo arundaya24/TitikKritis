@@ -21,6 +21,7 @@ class Critique extends Model
         'image',
         'is_anonymous',
         'status',
+        'user_can_reply',
         'is_archived',
         'submitted_at',
     ];
@@ -31,6 +32,7 @@ class Critique extends Model
             'is_anonymous' => 'boolean',
             'is_archived' => 'boolean',
             'submitted_at' => 'datetime',
+            'user_can_reply' => 'boolean',
         ];
     }
 
