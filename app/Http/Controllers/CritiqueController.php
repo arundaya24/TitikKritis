@@ -40,9 +40,10 @@ class CritiqueController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->input('search');
+
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%'.$search.'%')
-                    ->orWhere('content', 'like', '%'.$search.'%');
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('content', 'like', '%' . $search . '%');
             });
         }
 
@@ -82,6 +83,7 @@ class CritiqueController extends Controller
 
         $maxDailyReports = 3;
         $cooldownMinutes = 5;
+
         $remainingMinutes = 0;
         $remainingSeconds = 0;
 
@@ -137,7 +139,10 @@ class CritiqueController extends Controller
             return redirect()
                 ->back()
                 ->withInput()
-                ->with('error', 'Batas maksimal 3 laporan per hari sudah tercapai. Silakan coba lagi besok.');
+                ->with(
+                    'error',
+                    'Batas maksimal 3 laporan per hari sudah tercapai. Silakan coba lagi besok.'
+                );
         }
 
         $cooldownMinutes = 5;
@@ -169,7 +174,8 @@ class CritiqueController extends Controller
         $validator = $this->validateCritique($request);
 
         if ($validator->fails()) {
-            return redirect()->back()
+            return redirect()
+                ->back()
                 ->withErrors($validator)
                 ->withInput();
         }
@@ -178,11 +184,12 @@ class CritiqueController extends Controller
 
         $badWords = $this->checkBadWords($content);
 
-        if (! empty($badWords)) {
-            return redirect()->back()
+        if (!empty($badWords)) {
+            return redirect()
+                ->back()
                 ->withErrors([
                     'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '
-                        .implode(', ', $badWords),
+                        . implode(', ', $badWords),
                 ])
                 ->withInput();
         }
@@ -205,7 +212,10 @@ class CritiqueController extends Controller
             'content' => $content,
             'image' => $imagePath,
             'is_anonymous' => $request->boolean('is_anonymous'),
+
             'status' => 'dikirim',
+            'user_can_reply' => false,
+
             'submitted_at' => now(),
         ]);
 
@@ -217,10 +227,16 @@ class CritiqueController extends Controller
             'note' => 'Kritik dikirim oleh pengguna',
         ]);
 
-        $admins = User::whereIn('role', ['admin', 'super_admin'])->get();
+        $admins = User::whereIn('role', [
+            'admin',
+            'super_admin',
+        ])->get();
 
         if ($admins->isNotEmpty()) {
-            Notification::send($admins, new NewCritiqueSubmitted($critique));
+            Notification::send(
+                $admins,
+                new NewCritiqueSubmitted($critique)
+            );
         }
 
         return redirect()
@@ -247,7 +263,10 @@ class CritiqueController extends Controller
 
         $this->authorize('view', $critique);
 
-        return view('critique.show', compact('critique'));
+        return view(
+            'critique.show',
+            compact('critique')
+        );
     }
 
     public function edit($id)
@@ -315,7 +334,8 @@ class CritiqueController extends Controller
         $validator = $this->validateCritique($request);
 
         if ($validator->fails()) {
-            return redirect()->back()
+            return redirect()
+                ->back()
                 ->withErrors($validator)
                 ->withInput();
         }
@@ -324,11 +344,12 @@ class CritiqueController extends Controller
 
         $badWords = $this->checkBadWords($content);
 
-        if (! empty($badWords)) {
-            return redirect()->back()
+        if (!empty($badWords)) {
+            return redirect()
+                ->back()
                 ->withErrors([
                     'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '
-                        .implode(', ', $badWords),
+                        . implode(', ', $badWords),
                 ])
                 ->withInput();
         }
@@ -399,19 +420,32 @@ class CritiqueController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'archived_page');
 
-        return view('critique.history', compact('activeCritiques', 'archivedCritiques'));
+        return view(
+            'critique.history',
+            compact(
+                'activeCritiques',
+                'archivedCritiques'
+            )
+        );
     }
 
     protected function validateCritique(Request $request)
     {
         return Validator::make($request->all(), [
             'category_id' => 'required|exists:categories,id',
+
             'government_level' => 'required|in:kecamatan,kabupaten,provinsi',
+
             'province_id' => 'required|exists:provinces,id',
+
             'regency_id' => 'nullable|exists:regencies,id',
+
             'district_id' => 'nullable|exists:districts,id',
+
             'title' => 'required|string|max:255',
+
             'content' => 'required|string|min:10',
+
             'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:10240',
         ]);
     }
@@ -485,7 +519,6 @@ class CritiqueController extends Controller
         return response()->json($districts);
     }
 
-    // ===== HAPUS KRITIK YANG DITOLAK =====
     public function forceDelete($id)
     {
         $critique = Critique::where('user_id', Auth::id())
@@ -498,11 +531,14 @@ class CritiqueController extends Controller
 
         $critique->delete();
 
-        return redirect()->route('critique.history')
-            ->with('success', 'Kritik yang ditolak berhasil dihapus!');
+        return redirect()
+            ->route('critique.history')
+            ->with(
+                'success',
+                'Kritik yang ditolak berhasil dihapus!'
+            );
     }
 
-    // ===== ARSIP KRITIK YANG SELESAI =====
     public function archive($id)
     {
         $critique = Critique::where('user_id', Auth::id())
@@ -512,11 +548,14 @@ class CritiqueController extends Controller
         $critique->is_archived = true;
         $critique->save();
 
-        return redirect()->route('critique.history')
-            ->with('success', 'Kritik berhasil diarsipkan!');
+        return redirect()
+            ->route('critique.history')
+            ->with(
+                'success',
+                'Kritik berhasil diarsipkan!'
+            );
     }
 
-    // ===== KEMBALIKAN DARI ARSIP =====
     public function unarchive($id)
     {
         $critique = Critique::where('user_id', Auth::id())
@@ -526,11 +565,14 @@ class CritiqueController extends Controller
         $critique->is_archived = false;
         $critique->save();
 
-        return redirect()->route('critique.history')
-            ->with('success', 'Kritik berhasil dikembalikan dari arsip!');
+        return redirect()
+            ->route('critique.history')
+            ->with(
+                'success',
+                'Kritik berhasil dikembalikan dari arsip!'
+            );
     }
 
-    // ===== HAPUS DARI ARSIP =====
     public function deleteArchived($id)
     {
         $critique = Critique::where('user_id', Auth::id())
@@ -543,10 +585,15 @@ class CritiqueController extends Controller
 
         $critique->delete();
 
-        return redirect()->route('critique.history')
-            ->with('success', 'Kritik arsip berhasil dihapus!');
+        return redirect()
+            ->route('critique.history')
+            ->with(
+                'success',
+                'Kritik arsip berhasil dihapus!'
+            );
     }
-        public function message(Request $request, $id)
+
+    public function message(Request $request, $id)
     {
         $critique = Critique::where('user_id', Auth::id())
             ->findOrFail($id);
@@ -558,7 +605,7 @@ class CritiqueController extends Controller
             );
         }
 
-        if (! $critique->user_can_reply) {
+        if (!$critique->user_can_reply) {
             return back()->with(
                 'error',
                 'Anda belum dapat membalas. Tunggu admin mengubah status laporan.'
@@ -571,7 +618,7 @@ class CritiqueController extends Controller
 
         $critique->messages()->create([
             'user_id' => Auth::id(),
-            'message' => $request->message,
+            'message' => $request->input('message'),
         ]);
 
         $critique->update([

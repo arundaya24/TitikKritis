@@ -37,14 +37,15 @@ class AdminCritiqueController extends Controller
         }
 
         $archived = $request->input('archived', 0);
+
         $query->where('is_archived', $archived);
 
         if ($request->filled('search')) {
             $search = $request->input('search');
 
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%'.$search.'%')
-                    ->orWhere('content', 'like', '%'.$search.'%');
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('content', 'like', '%' . $search . '%');
             });
         }
 
@@ -64,7 +65,11 @@ class AdminCritiqueController extends Controller
 
         return view(
             'admin.critiques.index',
-            compact('critiques', 'categories', 'statuses')
+            compact(
+                'critiques',
+                'categories',
+                'statuses'
+            )
         );
     }
 
@@ -76,7 +81,8 @@ class AdminCritiqueController extends Controller
             'province',
             'regency',
             'district',
-        ])->where('is_archived', true);
+        ])
+            ->where('is_archived', true);
 
         if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
@@ -90,8 +96,8 @@ class AdminCritiqueController extends Controller
             $search = $request->input('search');
 
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%'.$search.'%')
-                    ->orWhere('content', 'like', '%'.$search.'%');
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('content', 'like', '%' . $search . '%');
             });
         }
 
@@ -111,7 +117,11 @@ class AdminCritiqueController extends Controller
 
         return view(
             'admin.critiques.archive',
-            compact('critiques', 'categories', 'statuses')
+            compact(
+                'critiques',
+                'categories',
+                'statuses'
+            )
         );
     }
 
@@ -138,7 +148,10 @@ class AdminCritiqueController extends Controller
 
         return view(
             'admin.critiques.show',
-            compact('critique', 'statuses')
+            compact(
+                'critique',
+                'statuses'
+            )
         );
     }
 
@@ -151,7 +164,8 @@ class AdminCritiqueController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
+            return redirect()
+                ->back()
                 ->withErrors($validator)
                 ->withInput();
         }
@@ -162,14 +176,55 @@ class AdminCritiqueController extends Controller
         if ($oldStatus === $newStatus) {
             return redirect()
                 ->route('admin.critiques.show', $critique->id)
-                ->with('error', 'Status tidak berubah.');
+                ->with(
+                    'error',
+                    'Status tidak berubah.'
+                );
         }
 
-        $isClosed = in_array($newStatus, ['selesai', 'ditolak']);
+        $allowedTransitions = [
+            'dikirim' => [
+                'ditinjau',
+                'ditolak',
+            ],
+
+            'ditinjau' => [
+                'diproses',
+                'ditolak',
+            ],
+
+            'diproses' => [
+                'selesai',
+            ],
+
+            'selesai' => [],
+
+            'ditolak' => [],
+        ];
+
+        if (
+            !isset($allowedTransitions[$oldStatus]) ||
+            !in_array(
+                $newStatus,
+                $allowedTransitions[$oldStatus]
+            )
+        ) {
+            return redirect()
+                ->back()
+                ->with(
+                    'error',
+                    "Status tidak dapat diubah dari {$oldStatus} menjadi {$newStatus}."
+                );
+        }
+
+        $isClosed = in_array(
+            $newStatus,
+            ['selesai', 'ditolak']
+        );
 
         $critique->update([
             'status' => $newStatus,
-            'user_can_reply' => ! $isClosed,
+            'user_can_reply' => !$isClosed,
         ]);
 
         CritiqueHistory::create([
@@ -181,8 +236,14 @@ class AdminCritiqueController extends Controller
         ]);
 
         return redirect()
-            ->route('admin.critiques.show', $critique->id)
-            ->with('success', 'Status kritik berhasil diperbarui!');
+            ->route(
+                'admin.critiques.show',
+                $critique->id
+            )
+            ->with(
+                'success',
+                'Status kritik berhasil diperbarui!'
+            );
     }
 
     public function respond(Request $request, $id)
@@ -194,7 +255,8 @@ class AdminCritiqueController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
+            return redirect()
+                ->back()
                 ->withErrors($validator)
                 ->withInput();
         }
@@ -218,17 +280,27 @@ class AdminCritiqueController extends Controller
         }
 
         return redirect()
-            ->route('admin.critiques.show', $critique->id)
-            ->with('success', 'Tanggapan berhasil dikirim!');
+            ->route(
+                'admin.critiques.show',
+                $critique->id
+            )
+            ->with(
+                'success',
+                'Tanggapan berhasil dikirim!'
+            );
     }
 
     public function forceDelete($id)
     {
-        $critique = Critique::where('status', 'ditolak')
-            ->findOrFail($id);
+        $critique = Critique::where(
+            'status',
+            'ditolak'
+        )->findOrFail($id);
 
         if ($critique->image) {
-            Storage::disk('public')->delete($critique->image);
+            Storage::disk('public')->delete(
+                $critique->image
+            );
         }
 
         $critique->delete();
@@ -243,8 +315,10 @@ class AdminCritiqueController extends Controller
 
     public function archive($id)
     {
-        $critique = Critique::where('status', 'selesai')
-            ->findOrFail($id);
+        $critique = Critique::where(
+            'status',
+            'selesai'
+        )->findOrFail($id);
 
         $critique->is_archived = true;
         $critique->save();
@@ -259,14 +333,16 @@ class AdminCritiqueController extends Controller
 
     public function unarchive($id)
     {
-        $critique = Critique::where('is_archived', true)
-            ->findOrFail($id);
+        $critique = Critique::where(
+            'is_archived',
+            true
+        )->findOrFail($id);
 
         $critique->is_archived = false;
         $critique->save();
 
         return redirect()
-            ->route('admin.critiques.index')
+            ->route('admin.critiques.archive.index')
             ->with(
                 'success',
                 'Kritik berhasil dikembalikan dari arsip!'
@@ -275,17 +351,21 @@ class AdminCritiqueController extends Controller
 
     public function deleteArchived($id)
     {
-        $critique = Critique::where('is_archived', true)
-            ->findOrFail($id);
+        $critique = Critique::where(
+            'is_archived',
+            true
+        )->findOrFail($id);
 
         if ($critique->image) {
-            Storage::disk('public')->delete($critique->image);
+            Storage::disk('public')->delete(
+                $critique->image
+            );
         }
 
         $critique->delete();
 
         return redirect()
-            ->route('admin.critiques.index')
+            ->route('admin.critiques.archive.index')
             ->with(
                 'success',
                 'Kritik arsip berhasil dihapus!'
@@ -296,7 +376,10 @@ class AdminCritiqueController extends Controller
     {
         $critique = Critique::findOrFail($id);
 
-        if (in_array($critique->status, ['selesai', 'ditolak'])) {
+        if (in_array(
+            $critique->status,
+            ['selesai', 'ditolak']
+        )) {
             return back()->with(
                 'error',
                 'Laporan ini sudah ditutup.'
@@ -309,7 +392,7 @@ class AdminCritiqueController extends Controller
 
         $critique->messages()->create([
             'user_id' => Auth::id(),
-            'message' => $request->message,
+            'message' => $request->input('message'),
         ]);
 
         if ($critique->user) {
