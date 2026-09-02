@@ -10,6 +10,7 @@ use App\Models\Province;
 use App\Models\Regency;
 use App\Models\User;
 use App\Notifications\NewCritiqueSubmitted;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -75,16 +76,96 @@ class CritiqueController extends Controller
             ->orderBy('submitted_at', 'desc')
             ->get();
 
+        $todayReports = Critique::where('user_id', Auth::id())
+            ->whereDate('submitted_at', now()->toDateString())
+            ->count();
+
+        $maxDailyReports = 3;
+        $cooldownMinutes = 5;
+        $remainingMinutes = 0;
+        $remainingSeconds = 0;
+
+        $lastCritique = Critique::where('user_id', Auth::id())
+            ->latest('submitted_at')
+            ->first();
+
+        $canSend = true;
+
+        if ($lastCritique) {
+            $cooldownEnd = Carbon::parse($lastCritique->submitted_at)
+                ->addMinutes($cooldownMinutes);
+
+            $now = now();
+
+            if ($now->lt($cooldownEnd)) {
+                $canSend = false;
+
+                $remainingSecondsTotal = $now->diffInSeconds($cooldownEnd);
+
+                $remainingMinutes = intdiv($remainingSecondsTotal, 60);
+                $remainingSeconds = $remainingSecondsTotal % 60;
+            }
+        }
+
+        if ($todayReports >= $maxDailyReports) {
+            $canSend = false;
+        }
+
         return view('critique.create', compact(
             'categories',
             'provinces',
             'user',
-            'recentCritiques'
+            'recentCritiques',
+            'todayReports',
+            'maxDailyReports',
+            'canSend',
+            'cooldownMinutes',
+            'remainingMinutes',
+            'remainingSeconds'
         ));
     }
 
     public function store(Request $request)
     {
+        $todayReports = Critique::where('user_id', Auth::id())
+            ->whereDate('submitted_at', now()->toDateString())
+            ->count();
+
+        $maxDailyReports = 3;
+
+        if ($todayReports >= $maxDailyReports) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Batas maksimal 3 laporan per hari sudah tercapai. Silakan coba lagi besok.');
+        }
+
+        $cooldownMinutes = 5;
+
+        $lastCritique = Critique::where('user_id', Auth::id())
+            ->latest('submitted_at')
+            ->first();
+
+        if ($lastCritique) {
+            $cooldownEnd = Carbon::parse($lastCritique->submitted_at)
+                ->addMinutes($cooldownMinutes);
+
+            if (now()->lt($cooldownEnd)) {
+                $remainingSecondsTotal = now()->diffInSeconds($cooldownEnd);
+
+                $remainingMinutes = intdiv($remainingSecondsTotal, 60);
+                $remainingSeconds = $remainingSecondsTotal % 60;
+
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with(
+                        'error',
+                        "Anda masih dalam cooldown. Tunggu {$remainingMinutes} menit {$remainingSeconds} detik lagi sebelum mengirim laporan baru."
+                    );
+            }
+        }
+
         $validator = $this->validateCritique($request);
 
         if ($validator->fails()) {
