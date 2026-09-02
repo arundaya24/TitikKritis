@@ -41,6 +41,7 @@ class AdminCritiqueController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->input('search');
+
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', '%'.$search.'%')
                     ->orWhere('content', 'like', '%'.$search.'%');
@@ -87,6 +88,7 @@ class AdminCritiqueController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->input('search');
+
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', '%'.$search.'%')
                     ->orWhere('content', 'like', '%'.$search.'%');
@@ -107,7 +109,10 @@ class AdminCritiqueController extends Controller
             'ditolak',
         ];
 
-        return view('admin.critiques.archive', compact('critiques', 'categories', 'statuses'));
+        return view(
+            'admin.critiques.archive',
+            compact('critiques', 'categories', 'statuses')
+        );
     }
 
     public function show($id)
@@ -120,6 +125,7 @@ class AdminCritiqueController extends Controller
             'district',
             'histories',
             'response',
+            'messages.user',
         ])->findOrFail($id);
 
         $statuses = [
@@ -206,7 +212,9 @@ class AdminCritiqueController extends Controller
         );
 
         if ($critique->user) {
-            $critique->user->notify(new CritiqueResponded($critique));
+            $critique->user->notify(
+                new CritiqueResponded($critique)
+            );
         }
 
         return redirect()
@@ -216,7 +224,8 @@ class AdminCritiqueController extends Controller
 
     public function forceDelete($id)
     {
-        $critique = Critique::where('status', 'ditolak')->findOrFail($id);
+        $critique = Critique::where('status', 'ditolak')
+            ->findOrFail($id);
 
         if ($critique->image) {
             Storage::disk('public')->delete($critique->image);
@@ -224,33 +233,50 @@ class AdminCritiqueController extends Controller
 
         $critique->delete();
 
-        return redirect()->route('admin.critiques.index')
-            ->with('success', 'Kritik yang ditolak berhasil dihapus!');
+        return redirect()
+            ->route('admin.critiques.index')
+            ->with(
+                'success',
+                'Kritik yang ditolak berhasil dihapus!'
+            );
     }
 
     public function archive($id)
     {
-        $critique = Critique::where('status', 'selesai')->findOrFail($id);
+        $critique = Critique::where('status', 'selesai')
+            ->findOrFail($id);
+
         $critique->is_archived = true;
         $critique->save();
 
-        return redirect()->route('admin.critiques.index')
-            ->with('success', 'Kritik berhasil diarsipkan!');
+        return redirect()
+            ->route('admin.critiques.index')
+            ->with(
+                'success',
+                'Kritik berhasil diarsipkan!'
+            );
     }
 
     public function unarchive($id)
     {
-        $critique = Critique::where('is_archived', true)->findOrFail($id);
+        $critique = Critique::where('is_archived', true)
+            ->findOrFail($id);
+
         $critique->is_archived = false;
         $critique->save();
 
-        return redirect()->route('admin.critiques.index')
-            ->with('success', 'Kritik berhasil dikembalikan dari arsip!');
+        return redirect()
+            ->route('admin.critiques.index')
+            ->with(
+                'success',
+                'Kritik berhasil dikembalikan dari arsip!'
+            );
     }
 
     public function deleteArchived($id)
     {
-        $critique = Critique::where('is_archived', true)->findOrFail($id);
+        $critique = Critique::where('is_archived', true)
+            ->findOrFail($id);
 
         if ($critique->image) {
             Storage::disk('public')->delete($critique->image);
@@ -258,8 +284,12 @@ class AdminCritiqueController extends Controller
 
         $critique->delete();
 
-        return redirect()->route('admin.critiques.index')
-            ->with('success', 'Kritik arsip berhasil dihapus!');
+        return redirect()
+            ->route('admin.critiques.index')
+            ->with(
+                'success',
+                'Kritik arsip berhasil dihapus!'
+            );
     }
 
     public function message(Request $request, $id)

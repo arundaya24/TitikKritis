@@ -4,7 +4,7 @@
 
     <div class="row">
         <div class="col-12">
-            {{-- ALERT --}}
+
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show">
                     {{ session('success') }}
@@ -31,7 +31,6 @@
 
             <div class="card">
 
-                {{-- HEADER --}}
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>
                         <i class="fas fa-file-alt me-2"></i>
@@ -49,6 +48,7 @@
                     <div class="row mb-3">
 
                         <div class="col-md-6">
+
                             <h3>{{ $critique->title }}</h3>
 
                             <p>
@@ -78,6 +78,7 @@
                                 </strong>
                                 {{ $critique->is_anonymous ? 'Tidak tersedia' : $critique->user->phone ?? '-' }}
                             </p>
+
                         </div>
 
                         <div class="col-md-6">
@@ -93,6 +94,7 @@
                                 <strong>
                                     <i class="fas fa-layer-group"></i> Tingkat:
                                 </strong>
+
                                 <span class="text-capitalize">
                                     {{ $critique->government_level }}
                                 </span>
@@ -118,6 +120,7 @@
                                 <strong>
                                     <i class="fas fa-calendar"></i> Tanggal:
                                 </strong>
+
                                 {{ $critique->submitted_at->format('d F Y H:i') }}
                             </p>
 
@@ -155,6 +158,7 @@
 
                     {{-- BUKTI USER --}}
                     @if ($critique->image)
+
                         <div class="mb-4">
 
                             <h5>
@@ -163,23 +167,91 @@
                             </h5>
 
                             @if (str_ends_with(strtolower($critique->image), '.pdf'))
-                                <a href="{{ asset('storage/' . $critique->image) }}" target="_blank"
+
+                                <a href="{{ asset('storage/' . $critique->image) }}"
+                                    target="_blank"
                                     class="btn btn-outline-secondary">
 
                                     <i class="fas fa-file-pdf me-2"></i>
                                     Buka Dokumen PDF
 
                                 </a>
+
                             @else
-                                <img src="{{ asset('storage/' . $critique->image) }}" alt="Foto Bukti"
-                                    class="img-fluid rounded" style="max-height: 400px;">
+
+                                <img src="{{ asset('storage/' . $critique->image) }}"
+                                    alt="Foto Bukti"
+                                    class="img-fluid rounded"
+                                    style="max-height: 400px;">
+
                             @endif
 
                         </div>
+
                     @endif
+
+                    {{-- PESAN / BALASAN USER --}}
+                    <div class="mb-4">
+
+                        <h5 class="mb-3">
+                            <i class="fas fa-comments me-2"></i>
+                            Balasan Dari Pengguna
+                        </h5>
+
+                        @if ($critique->messages && $critique->messages->count())
+
+                            @foreach ($critique->messages->sortBy('created_at') as $message)
+
+                                <div class="border rounded p-3 mb-3">
+
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+
+                                        <div>
+                                            <strong>
+                                                <i class="fas fa-user me-1"></i>
+                                                {{ $message->user?->name ?? 'Pengguna' }}
+                                            </strong>
+
+                                            @if ($message->user_id === $critique->user_id)
+                                                <span class="badge bg-primary ms-2">
+                                                    Pengguna
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <small class="text-muted">
+                                            {{ $message->created_at->format('d F Y H:i') }}
+                                        </small>
+
+                                    </div>
+
+                                    <div class="p-3 bg-light rounded">
+
+                                        {!! nl2br(e($message->message)) !!}
+
+                                    </div>
+
+                                </div>
+
+                            @endforeach
+
+                        @else
+
+                            <div class="alert alert-light border">
+
+                                <i class="fas fa-info-circle me-2"></i>
+
+                                Belum ada balasan dari pengguna.
+
+                            </div>
+
+                        @endif
+
+                    </div>
 
                     {{-- RIWAYAT PERUBAHAN + BUKTI --}}
                     @if ($critique->updates && $critique->updates->count())
+
                         <div class="mb-4">
 
                             <h5>
@@ -188,6 +260,7 @@
                             </h5>
 
                             @foreach ($critique->updates->sortByDesc('created_at') as $update)
+
                                 <div class="border rounded p-3 mb-3">
 
                                     <div class="d-flex justify-content-between">
@@ -217,6 +290,7 @@
                                     </div>
 
                                     @if ($update->files && $update->files->count())
+
                                         <div class="mt-3">
 
                                             <strong class="d-block mb-2">
@@ -227,9 +301,13 @@
                                             <div class="row g-2">
 
                                                 @foreach ($update->files as $file)
+
                                                     @php
                                                         $extension = strtolower(
-                                                            pathinfo($file->original_name, PATHINFO_EXTENSION),
+                                                            pathinfo(
+                                                                $file->original_name,
+                                                                PATHINFO_EXTENSION
+                                                            )
                                                         );
                                                     @endphp
 
@@ -238,17 +316,23 @@
                                                         <div class="border rounded p-2">
 
                                                             @if (in_array($extension, ['jpg', 'jpeg', 'png', 'webp']))
+
                                                                 <img src="{{ asset('storage/' . $file->file_path) }}"
                                                                     class="img-fluid rounded mb-2"
                                                                     style="height: 150px; width: 100%; object-fit: cover;">
-                                                            @elseif($extension === 'pdf')
+
+                                                            @elseif ($extension === 'pdf')
+
                                                                 <div class="text-center py-4">
                                                                     <i class="fas fa-file-pdf fa-3x text-danger"></i>
                                                                 </div>
+
                                                             @else
+
                                                                 <div class="text-center py-4">
                                                                     <i class="fas fa-file fa-3x text-secondary"></i>
                                                                 </div>
+
                                                             @endif
 
                                                             <a href="{{ asset('storage/' . $file->file_path) }}"
@@ -263,25 +347,32 @@
                                                         </div>
 
                                                     </div>
+
                                                 @endforeach
 
                                             </div>
 
                                         </div>
+
                                     @else
+
                                         <div class="text-muted small mt-2">
                                             Tidak ada bukti pada perubahan ini.
                                         </div>
+
                                     @endif
 
                                 </div>
+
                             @endforeach
 
                         </div>
+
                     @endif
 
                     {{-- RIWAYAT STATUS LAMA --}}
                     @if ($critique->histories->count() > 0)
+
                         <div class="mb-4">
 
                             <h5>
@@ -294,33 +385,44 @@
                                 <table class="table table-sm">
 
                                     <thead>
+
                                         <tr>
                                             <th>Status Sebelum</th>
                                             <th>Status Baru</th>
                                             <th>Diubah Oleh</th>
                                             <th>Tanggal</th>
                                         </tr>
+
                                     </thead>
 
                                     <tbody>
 
                                         @foreach ($critique->histories as $history)
+
                                             <tr>
 
                                                 <td>
+
                                                     @if ($history->old_status)
+
                                                         <span class="badge badge-status badge-{{ $history->old_status }}">
                                                             {{ ucfirst($history->old_status) }}
                                                         </span>
+
                                                     @else
+
                                                         -
+
                                                     @endif
+
                                                 </td>
 
                                                 <td>
+
                                                     <span class="badge badge-status badge-{{ $history->new_status }}">
                                                         {{ ucfirst($history->new_status) }}
                                                     </span>
+
                                                 </td>
 
                                                 <td>
@@ -332,6 +434,7 @@
                                                 </td>
 
                                             </tr>
+
                                         @endforeach
 
                                     </tbody>
@@ -341,12 +444,14 @@
                             </div>
 
                         </div>
+
                     @endif
 
                     <hr>
 
                     <div class="row g-3">
 
+                        {{-- UBAH STATUS --}}
                         <div class="col-md-6">
 
                             <div class="border rounded p-3 h-100">
@@ -356,7 +461,8 @@
                                     Ubah Status Laporan
                                 </h5>
 
-                                <form method="POST" action="{{ route('admin.critiques.status', $critique->id) }}"
+                                <form method="POST"
+                                    action="{{ route('admin.critiques.status', $critique->id) }}"
                                     enctype="multipart/form-data">
 
                                     @csrf
@@ -368,15 +474,19 @@
                                             Status Baru
                                         </label>
 
-                                        <select name="status" class="form-select" required>
+                                        <select name="status"
+                                            class="form-select"
+                                            required>
 
                                             @foreach ($statuses as $status)
+
                                                 <option value="{{ $status }}"
                                                     {{ $critique->status === $status ? 'selected' : '' }}>
 
                                                     {{ ucfirst($status) }}
 
                                                 </option>
+
                                             @endforeach
 
                                         </select>
@@ -389,7 +499,11 @@
                                             Bukti Perubahan
                                         </label>
 
-                                        <input type="file" name="files[]" class="form-control" multiple required
+                                        <input type="file"
+                                            name="files[]"
+                                            class="form-control"
+                                            multiple
+                                            required
                                             accept="image/*,.pdf,.doc,.docx">
 
                                         <small class="text-muted">
@@ -398,7 +512,8 @@
 
                                     </div>
 
-                                    <button type="submit" class="btn btn-primary w-100">
+                                    <button type="submit"
+                                        class="btn btn-primary w-100">
 
                                         <i class="fas fa-save me-2"></i>
                                         Simpan Perubahan
@@ -411,6 +526,7 @@
 
                         </div>
 
+                        {{-- TANGGAPAN ADMIN --}}
                         <div class="col-md-6">
 
                             <div class="border rounded p-3 h-100">
@@ -420,18 +536,23 @@
                                     Tanggapan Admin
                                 </h5>
 
-                                <form method="POST" action="{{ route('admin.critiques.respond', $critique->id) }}">
+                                <form method="POST"
+                                    action="{{ route('admin.critiques.respond', $critique->id) }}">
 
                                     @csrf
 
                                     <div class="mb-3">
 
-                                        <textarea name="content" class="form-control" rows="7" placeholder="Tulis tanggapan kepada pengguna..."
+                                        <textarea name="content"
+                                            class="form-control"
+                                            rows="7"
+                                            placeholder="Tulis tanggapan kepada pengguna..."
                                             required></textarea>
 
                                     </div>
 
-                                    <button type="submit" class="btn btn-success w-100">
+                                    <button type="submit"
+                                        class="btn btn-success w-100">
 
                                         <i class="fas fa-paper-plane me-2"></i>
                                         Kirim Tanggapan
@@ -441,6 +562,7 @@
                                 </form>
 
                                 @if ($critique->response)
+
                                     <hr>
 
                                     <div class="bg-light rounded p-3">
@@ -458,6 +580,7 @@
                                         </small>
 
                                     </div>
+
                                 @endif
 
                             </div>
@@ -473,7 +596,8 @@
             {{-- KEMBALI --}}
             <div class="mt-4">
 
-                <a href="{{ route('admin.critiques.index') }}" class="btn btn-secondary">
+                <a href="{{ route('admin.critiques.index') }}"
+                    class="btn btn-secondary">
 
                     <i class="fas fa-arrow-left me-2"></i>
                     Kembali
@@ -481,6 +605,8 @@
                 </a>
 
             </div>
+
         </div>
     </div>
+
 @endsection

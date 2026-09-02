@@ -546,8 +546,7 @@ class CritiqueController extends Controller
         return redirect()->route('critique.history')
             ->with('success', 'Kritik arsip berhasil dihapus!');
     }
-
-    public function message(Request $request, $id)
+        public function message(Request $request, $id)
     {
         $critique = Critique::where('user_id', Auth::id())
             ->findOrFail($id);
@@ -555,14 +554,14 @@ class CritiqueController extends Controller
         if (in_array($critique->status, ['selesai', 'ditolak'])) {
             return back()->with(
                 'error',
-                'Laporan ini sudah selesai dan tidak dapat dibalas lagi.'
+                'Laporan ini sudah ditutup dan tidak dapat dibalas lagi.'
             );
         }
 
         if (! $critique->user_can_reply) {
             return back()->with(
                 'error',
-                'Anda belum dapat membalas laporan ini. Tunggu perubahan status dari admin.'
+                'Anda belum dapat membalas. Tunggu admin mengubah status laporan.'
             );
         }
 
