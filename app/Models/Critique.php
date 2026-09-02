@@ -111,4 +111,9 @@ class Critique extends Model
     {
         return $query->where('category_id', $categoryId);
     }
+
+    public function messages()
+    {
+        return $this->hasMany(CritiqueMessage::class);
+    }
 }

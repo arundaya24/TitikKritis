@@ -157,6 +157,8 @@ class CritiqueController extends Controller
             'district',
             'histories',
             'response',
+            'updates.files',
+            'updates.user',
         ])
             ->where('user_id', Auth::id())
             ->findOrFail($id);
@@ -461,5 +463,32 @@ class CritiqueController extends Controller
 
         return redirect()->route('critique.history')
             ->with('success', 'Kritik arsip berhasil dihapus!');
+    }
+
+    public function message(Request $request, $id)
+    {
+        $critique = Critique::where('user_id', Auth::id())
+            ->findOrFail($id);
+
+        if (in_array($critique->status, ['selesai', 'ditolak'])) {
+            return back()->with(
+                'error',
+                'Laporan ini sudah selesai dan tidak dapat dibalas lagi.'
+            );
+        }
+
+        $request->validate([
+            'message' => 'required|string|min:1|max:5000',
+        ]);
+
+        $critique->messages()->create([
+            'user_id' => Auth::id(),
+            'message' => $request->message,
+        ]);
+
+        return back()->with(
+            'success',
+            'Balasan berhasil dikirim.'
+        );
     }
 }

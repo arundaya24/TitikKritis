@@ -2,53 +2,47 @@
 
 namespace App\Notifications;
 
+use App\Models\Critique;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class CritiqueStatusUpdated extends Notification
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(
+        protected Critique $critique,
+        protected string $oldStatus,
+        protected string $newStatus
+    ) {}
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
         return [
-            //
+            'type' => 'critique_status_updated',
+
+            'critique_id' => $this->critique->id,
+
+            'title' => $this->critique->title,
+
+            'message' =>
+                'Status laporan "' .
+                $this->critique->title .
+                '" telah diubah dari "' .
+                ucfirst($this->oldStatus) .
+                '" menjadi "' .
+                ucfirst($this->newStatus) .
+                '".',
+
+            'url' => route(
+                'critique.show',
+                $this->critique->id
+            ),
         ];
     }
 }
