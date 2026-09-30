@@ -80,7 +80,7 @@ class AdminUserManagementController extends Controller
                 ->with('error', 'Anda tidak dapat mengubah role sendiri!');
         }
 
-        // ✅ BENAR: Langsung set role, tanpa syncRoles()
+        //Langsung set role, tanpa syncRoles()
         $user->role = 'admin';
         $user->save();
 

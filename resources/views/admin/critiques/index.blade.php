@@ -51,8 +51,7 @@
                     <div class="col-md-2">
                         <select class="form-select" name="archived">
                             <option value="0" {{ request('archived', 0) == '0' ? 'selected' : '' }}>Aktif</option>
-                            <option value="1" {{ request('archived') == '1' ? 'selected' : '' }}>Arsip</option>
-                            <option value="" {{ request('archived') === '' ? 'selected' : '' }}>Semua</option>
+                            <option value="1" {{ request('archived', 1) == '1' ? 'selected' : '' }}>Arsip</option>
                         </select>
                     </div>
                     <div class="col-md-2">

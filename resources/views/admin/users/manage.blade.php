@@ -22,44 +22,53 @@
             @endif
 
             {{-- Statistik --}}
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="card bg-primary text-light">
-                        <div class="card-body text-center bg-primary" style="border-radius: 10px;">
-                            <h5 class="card-title">Total User</h5>
-                            <h2>{{ $totalUsers }}</h2>
-                            <small>Semua user terdaftar</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-success text-light">
-                        <div class="card-body text-center bg-success" style="border-radius: 10px;">
-                            <h5 class="card-title">User Aktif</h5>
-                            <h2>{{ $activeUsers }}</h2>
-                            <small>Pernah kirim kritik</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-info text-light">
-                        <div class="card-body text-center bg-info" style="border-radius: 10px;">
-                            <h5 class="card-title">Total Admin</h5>
-                            <h2>{{ $totalAdmins }}</h2>
-                            <small>Role administrator</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-warning text-light">
-                        <div class="card-body text-center bg-warning" style="border-radius: 10px;">
-                            <h5 class="card-title">Total Kritik</h5>
-                            <h2>{{ $totalCritiques }}</h2>
-                            <small>Semua kritik terkirim</small>
-                        </div>
-                    </div>
-                </div>
+<div class="row g-3 mb-4">
+    <div class="col-md">
+        <div class="card bg-primary text-light">
+            <div class="card-body text-center bg-primary" style="border-radius: 10px;">
+                <h5 class="card-title">Total User</h5>
+                <h2>{{ $totalUsers }}</h2>
+                <small>Semua user terdaftar</small>
             </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card bg-success text-light">
+            <div class="card-body text-center bg-success" style="border-radius: 10px;">
+                <h5 class="card-title">User Aktif</h5>
+                <h2>{{ $activeUsers }}</h2>
+                <small>Pernah kirim kritik</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card bg-info text-light">
+            <div class="card-body text-center bg-info" style="border-radius: 10px;">
+                <h5 class="card-title">Total Admin</h5>
+                <h2>{{ $totalAdmins }}</h2>
+                <small>Role administrator</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card bg-secondary text-light">
+            <div class="card-body text-center bg-secondary" style="border-radius: 10px;">
+                <h5 class="card-title">Total Super Admin</h5>
+                <h2>{{ $totalSuperAdmins }}</h2>
+                <small>Role super administrator</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card bg-warning text-light">
+            <div class="card-body text-center bg-warning" style="border-radius: 10px;">
+                <h5 class="card-title">Total Kritik</h5>
+                <h2>{{ $totalCritiques }}</h2>
+                <small>Semua kritik terkirim</small>
+            </div>
+        </div>
+    </div>
+</div>
 
             {{-- Tabel User --}}
             @if ($users->count() > 0)
