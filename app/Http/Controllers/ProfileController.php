@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\District;
 use App\Models\Province;
 use App\Models\Regency;
-use App\Models\District;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
 {
@@ -33,8 +33,8 @@ class ProfileController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'username' => 'required|string|max:255|unique:users,username,'.$user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
             'phone' => 'nullable|string|max:20',
             'province_id' => 'required|exists:provinces,id',
             'regency_id' => 'required|exists:regencies,id',
@@ -51,11 +51,11 @@ class ProfileController extends Controller
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {
-                Storage::disk('public')->delete('avatars/' . $user->avatar);
+                Storage::disk('public')->delete('avatars/'.$user->avatar);
             }
 
             $file = $request->file('avatar');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = time().'_'.$file->getClientOriginalName();
             $file->storeAs('avatars', $filename, 'public');
             $user->avatar = $filename;
         }
@@ -81,9 +81,10 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         if ($user->avatar) {
-            Storage::disk('public')->delete('avatars/' . $user->avatar);
+            Storage::disk('public')->delete('avatars/'.$user->avatar);
             $user->avatar = null;
             $user->save();
+
             return redirect()->route('profile.index')
                 ->with('success', 'Foto profile berhasil dihapus!');
         }
@@ -107,7 +108,7 @@ class ProfileController extends Controller
                 ->withInput();
         }
 
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return redirect()->back()
                 ->withErrors(['current_password' => 'Password saat ini salah.'])
                 ->withInput();

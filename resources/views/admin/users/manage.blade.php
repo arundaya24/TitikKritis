@@ -97,13 +97,11 @@
                                     <td>{{ $user->created_at->format('d/m/Y') }}</td>
                                     <td>
                                         <div class="d-flex gap-2">
-                                            <a href="{{ route('admin.users.detail', $user->id) }}"
-                                                class="btn btn-info btn-sm">
+                                            <a href="{{ route('admin.users.detail', $user->id) }}" class="btn btn-info btn-sm">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             @if ($user->id !== auth()->id())
-                                                <a href="{{ route('admin.users.toggle', $user->id) }}"
-                                                    class="btn btn-success btn-sm"
+                                                <a href="{{ route('admin.users.toggle', $user->id) }}" class="btn btn-success btn-sm"
                                                     onclick="return confirm('Jadikan user ini sebagai Admin?')">
                                                     <i class="fas fa-user-shield"></i>
                                                 </a>

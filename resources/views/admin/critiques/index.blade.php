@@ -42,8 +42,7 @@
                         <select class="form-select" name="category">
                             <option value="">Semua Kategori</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category->id }}"
-                                    {{ request('category') == $category->id ? 'selected' : '' }}>
+                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
                             @endforeach
@@ -113,9 +112,8 @@
                                             </a>
 
                                             @if ($critique->status === 'ditolak' && !$critique->is_archived)
-                                                <form action="{{ route('admin.critiques.force.delete', $critique->id) }}"
-                                                    method="POST" class="d-inline"
-                                                    onsubmit="return confirm('Hapus kritik yang ditolak ini?')">
+                                                <form action="{{ route('admin.critiques.force.delete', $critique->id) }}" method="POST"
+                                                    class="d-inline" onsubmit="return confirm('Hapus kritik yang ditolak ini?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -125,8 +123,8 @@
                                             @endif
 
                                             @if ($critique->status === 'selesai' && !$critique->is_archived)
-                                                <form action="{{ route('admin.critiques.archive', $critique->id) }}"
-                                                    method="POST" class="d-inline">
+                                                <form action="{{ route('admin.critiques.archive', $critique->id) }}" method="POST"
+                                                    class="d-inline">
                                                     @csrf
                                                     @method('PUT')
                                                     <button type="submit" class="btn btn-sm btn-secondary">
@@ -136,16 +134,15 @@
                                             @endif
 
                                             @if ($critique->is_archived)
-                                                <form action="{{ route('admin.critiques.unarchive', $critique->id) }}"
-                                                    method="POST" class="d-inline">
+                                                <form action="{{ route('admin.critiques.unarchive', $critique->id) }}" method="POST"
+                                                    class="d-inline">
                                                     @csrf
                                                     @method('PUT')
                                                     <button type="submit" class="btn btn-sm btn-warning">
                                                         <i class="fas fa-undo"></i> Kembalikan
                                                     </button>
                                                 </form>
-                                                <form
-                                                    action="{{ route('admin.critiques.delete.archived', $critique->id) }}"
+                                                <form action="{{ route('admin.critiques.delete.archived', $critique->id) }}"
                                                     method="POST" class="d-inline"
                                                     onsubmit="return confirm('Hapus kritik dari arsip?')">
                                                     @csrf

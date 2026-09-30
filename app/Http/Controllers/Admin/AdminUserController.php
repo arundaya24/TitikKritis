@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Province;
-use App\Models\Regency;
-use App\Models\District;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -31,6 +29,7 @@ class AdminUserController extends Controller
         $provinces = Province::orderBy('name')->get();
         // Cek apakah user yang login bisa membuat super admin
         $canCreateSuperAdmin = auth()->user()->canCreateSuperAdmin();
+
         return view('admin.users.create', compact('provinces', 'canCreateSuperAdmin'));
     }
 
@@ -59,7 +58,7 @@ class AdminUserController extends Controller
         $role = $request->role ?? 'admin';
 
         // Hanya super admin yang bisa membuat super admin
-        if ($role === 'super_admin' && !auth()->user()->canCreateSuperAdmin()) {
+        if ($role === 'super_admin' && ! auth()->user()->canCreateSuperAdmin()) {
             return redirect()->back()
                 ->with('error', 'Anda tidak memiliki izin untuk membuat Super Admin!')
                 ->withInput();
@@ -79,8 +78,9 @@ class AdminUserController extends Controller
         ]);
 
         $roleName = $role === 'super_admin' ? 'Super Admin' : 'Admin';
+
         return redirect()->route('admin.users.index')
-            ->with('success', $roleName . ' berhasil ditambahkan!');
+            ->with('success', $roleName.' berhasil ditambahkan!');
     }
 
     public function destroy($id)
@@ -94,7 +94,7 @@ class AdminUserController extends Controller
         }
 
         // Hanya super admin yang bisa hapus super admin
-        if ($user->role === 'super_admin' && !auth()->user()->canManageAdmins()) {
+        if ($user->role === 'super_admin' && ! auth()->user()->canManageAdmins()) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Hanya Super Admin yang bisa menghapus Super Admin!');
         }
@@ -123,7 +123,7 @@ class AdminUserController extends Controller
         }
 
         // Hanya super admin yang bisa turunkan super admin
-        if ($user->role === 'super_admin' && !auth()->user()->canManageAdmins()) {
+        if ($user->role === 'super_admin' && ! auth()->user()->canManageAdmins()) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Hanya Super Admin yang bisa menurunkan Super Admin!');
         }
@@ -140,14 +140,14 @@ class AdminUserController extends Controller
         $user->save();
 
         return redirect()->route('admin.users.index')
-            ->with('success', $user->name . ' berhasil diturunkan menjadi user biasa!');
+            ->with('success', $user->name.' berhasil diturunkan menjadi user biasa!');
     }
 
     // ===== PROMOTE: User/Admin menjadi Super Admin =====
     public function promote($id)
     {
         // Hanya super admin yang bisa promote
-        if (!auth()->user()->canCreateSuperAdmin()) {
+        if (! auth()->user()->canCreateSuperAdmin()) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Hanya Super Admin yang bisa membuat Super Admin baru!');
         }
@@ -163,6 +163,6 @@ class AdminUserController extends Controller
         $user->save();
 
         return redirect()->route('admin.users.index')
-            ->with('success', $user->name . ' berhasil dijadikan Super Admin!');
+            ->with('success', $user->name.' berhasil dijadikan Super Admin!');
     }
 }

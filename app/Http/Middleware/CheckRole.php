@@ -10,7 +10,7 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login');
         }
 
@@ -22,7 +22,7 @@ class CheckRole
         }
 
         // Jika role spesifik, cek exact match
-        if (!in_array($user->role, $roles)) {
+        if (! in_array($user->role, $roles)) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
 

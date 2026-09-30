@@ -42,8 +42,8 @@ class CritiqueController extends Controller
             $search = $request->input('search');
 
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('content', 'like', '%' . $search . '%');
+                $q->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('content', 'like', '%'.$search.'%');
             });
         }
 
@@ -184,12 +184,12 @@ class CritiqueController extends Controller
 
         $badWords = $this->checkBadWords($content);
 
-        if (!empty($badWords)) {
+        if (! empty($badWords)) {
             return redirect()
                 ->back()
                 ->withErrors([
                     'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '
-                        . implode(', ', $badWords),
+                        .implode(', ', $badWords),
                 ])
                 ->withInput();
         }
@@ -344,12 +344,12 @@ class CritiqueController extends Controller
 
         $badWords = $this->checkBadWords($content);
 
-        if (!empty($badWords)) {
+        if (! empty($badWords)) {
             return redirect()
                 ->back()
                 ->withErrors([
                     'content' => 'Kritik mengandung kata-kata yang tidak diperbolehkan: '
-                        . implode(', ', $badWords),
+                        .implode(', ', $badWords),
                 ])
                 ->withInput();
         }
@@ -605,7 +605,7 @@ class CritiqueController extends Controller
             );
         }
 
-        if (!$critique->user_can_reply) {
+        if (! $critique->user_can_reply) {
             return back()->with(
                 'error',
                 'Anda belum dapat membalas. Tunggu admin mengubah status laporan.'

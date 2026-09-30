@@ -44,8 +44,8 @@ class AdminCritiqueController extends Controller
             $search = $request->input('search');
 
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('content', 'like', '%' . $search . '%');
+                $q->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('content', 'like', '%'.$search.'%');
             });
         }
 
@@ -96,8 +96,8 @@ class AdminCritiqueController extends Controller
             $search = $request->input('search');
 
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('content', 'like', '%' . $search . '%');
+                $q->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('content', 'like', '%'.$search.'%');
             });
         }
 
@@ -203,8 +203,8 @@ class AdminCritiqueController extends Controller
         ];
 
         if (
-            !isset($allowedTransitions[$oldStatus]) ||
-            !in_array(
+            ! isset($allowedTransitions[$oldStatus]) ||
+            ! in_array(
                 $newStatus,
                 $allowedTransitions[$oldStatus]
             )
@@ -224,7 +224,7 @@ class AdminCritiqueController extends Controller
 
         $critique->update([
             'status' => $newStatus,
-            'user_can_reply' => !$isClosed,
+            'user_can_reply' => ! $isClosed,
         ]);
 
         CritiqueHistory::create([

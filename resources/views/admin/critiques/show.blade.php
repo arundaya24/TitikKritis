@@ -174,8 +174,8 @@
 
                                 </a>
                             @else
-                                <img src="{{ asset('storage/' . $critique->image) }}" alt="Foto Bukti"
-                                    class="img-fluid rounded" style="max-height: 400px;">
+                                <img src="{{ asset('storage/' . $critique->image) }}" alt="Foto Bukti" class="img-fluid rounded"
+                                    style="max-height: 400px;">
                             @endif
 
                         </div>
@@ -307,8 +307,7 @@
                                                                 </div>
                                                             @endif
 
-                                                            <a href="{{ asset('storage/' . $file->file_path) }}"
-                                                                target="_blank"
+                                                            <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank"
                                                                 class="btn btn-sm btn-outline-primary w-100">
 
                                                                 <i class="fas fa-external-link-alt me-1"></i>
@@ -507,8 +506,8 @@
 
                                     <div class="mb-3">
 
-                                        <textarea name="content" class="form-control" rows="7" placeholder="Tulis tanggapan kepada pengguna..."
-                                            required></textarea>
+                                        <textarea name="content" class="form-control" rows="7"
+                                            placeholder="Tulis tanggapan kepada pengguna..." required></textarea>
 
                                     </div>
 

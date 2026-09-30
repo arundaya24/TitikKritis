@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Critique;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
@@ -42,10 +41,10 @@ class AdminDashboardController extends Controller
 
         // ===== TREND 6 BULAN TERAKHIR (MULAI DARI BULAN INI) =====
         $monthlyCritiques = Critique::select(
-                DB::raw('MONTH(submitted_at) as month'),
-                DB::raw('YEAR(submitted_at) as year'),
-                DB::raw('count(*) as total')
-            )
+            DB::raw('MONTH(submitted_at) as month'),
+            DB::raw('YEAR(submitted_at) as year'),
+            DB::raw('count(*) as total')
+        )
             ->where('submitted_at', '>=', now()->subMonths(5)->startOfMonth())
             ->groupBy('year', 'month')
             ->orderBy('year', 'asc')

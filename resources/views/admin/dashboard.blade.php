@@ -208,7 +208,7 @@
     {{-- Chart.js --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const colors = {
                 blue: '#0d6efd',
                 green: '#28a745',
@@ -273,112 +273,112 @@
                 });
             @endif
 
-            // ===== 2. CATEGORY CHART (Horizontal Bar) =====
-            @if ($categoryStats->count() > 0)
-                const categoryCtx = document.getElementById('adminCategoryChart').getContext('2d');
-                const categoryLabels = {!! json_encode($categoryStats->pluck('name')->toArray()) !!};
-                const categoryData = {!! json_encode($categoryStats->pluck('total')->toArray()) !!};
+                // ===== 2. CATEGORY CHART (Horizontal Bar) =====
+                @if ($categoryStats->count() > 0)
+                    const categoryCtx = document.getElementById('adminCategoryChart').getContext('2d');
+                    const categoryLabels = {!! json_encode($categoryStats->pluck('name')->toArray()) !!};
+                    const categoryData = {!! json_encode($categoryStats->pluck('total')->toArray()) !!};
 
-                new Chart(categoryCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: categoryLabels,
-                        datasets: [{
-                            label: 'Jumlah Kritik',
-                            data: categoryData,
-                            backgroundColor: categoryData.map((_, i) => colorPalette[i %
-                                colorPalette.length]),
-                            borderRadius: 6,
-                            borderSkipped: false
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
+                    new Chart(categoryCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: categoryLabels,
+                            datasets: [{
+                                label: 'Jumlah Kritik',
+                                data: categoryData,
+                                backgroundColor: categoryData.map((_, i) => colorPalette[i %
+                                    colorPalette.length]),
+                                borderRadius: 6,
+                                borderSkipped: false
+                            }]
                         },
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1,
-                                    font: {
-                                        size: 10
-                                    }
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: false
                                 }
                             },
-                            y: {
-                                ticks: {
-                                    font: {
-                                        size: 10
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1,
+                                        font: {
+                                            size: 10
+                                        }
+                                    }
+                                },
+                                y: {
+                                    ticks: {
+                                        font: {
+                                            size: 10
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                });
-            @endif
+                    });
+                @endif
 
-            // ===== 3. TREND CHART (Line) - URUTAN KIRI KE KANAN =====
-            @if ($monthlyCritiques->count() > 0)
-                const trendCtx = document.getElementById('adminTrendChart').getContext('2d');
-                const trendLabels = {!! json_encode(
-                    $monthlyCritiques->map(function ($item) {
+                // ===== 3. TREND CHART (Line) - URUTAN KIRI KE KANAN =====
+                @if ($monthlyCritiques->count() > 0)
+                        const trendCtx = document.getElementById('adminTrendChart').getContext('2d');
+                        const trendLabels = {!! json_encode(
+                        $monthlyCritiques->map(function ($item) {
                             return \DateTime::createFromFormat('!m', $item->month)->format('F') . ' ' . $item->year;
                         })->toArray(),
-                ) !!};
-                const trendData = {!! json_encode($monthlyCritiques->pluck('total')->toArray()) !!};
+                    ) !!};
+                        const trendData = {!! json_encode($monthlyCritiques->pluck('total')->toArray()) !!};
 
-                new Chart(trendCtx, {
-                    type: 'line',
-                    data: {
-                        labels: trendLabels,
-                        datasets: [{
-                            label: 'Jumlah Kritik',
-                            data: trendData,
-                            borderColor: '#0d6efd',
-                            backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#0d6efd',
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1,
-                                    font: {
-                                        size: 10
-                                    }
-                                }
+                        new Chart(trendCtx, {
+                            type: 'line',
+                            data: {
+                                labels: trendLabels,
+                                datasets: [{
+                                    label: 'Jumlah Kritik',
+                                    data: trendData,
+                                    borderColor: '#0d6efd',
+                                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointBackgroundColor: '#0d6efd',
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6
+                                }]
                             },
-                            x: {
-                                ticks: {
-                                    font: {
-                                        size: 10
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            stepSize: 1,
+                                            font: {
+                                                size: 10
+                                            }
+                                        }
+                                    },
+                                    x: {
+                                        ticks: {
+                                            font: {
+                                                size: 10
+                                            }
+                                        }
                                     }
                                 }
                             }
-                        }
-                    }
-                });
-            @endif
-        });
+                        });
+                @endif
+            });
     </script>
 
     {{-- Dark mode fix untuk chart --}}
