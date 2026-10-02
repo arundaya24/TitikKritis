@@ -98,4 +98,13 @@ Route::middleware(['auth', 'role:admin|superadmin'])->prefix('admin')->name('adm
     Route::get('/users/detail/{id}', [AdminUserManagementController::class, 'show'])->name('users.detail');
     Route::delete('/users/delete/{id}', [AdminUserManagementController::class, 'destroy'])->name('users.delete');
     Route::get('/users/toggle/{id}', [AdminUserManagementController::class, 'toggleAdmin'])->name('users.toggle');
+
+    Route::get('/test-session', function () {
+    return [
+        'session_id' => session()->getId(),
+        'user_id' => auth()->id(),
+        'username' => auth()->user()?->username,
+        'roles' => auth()->user()?->getRoleNames(),
+    ];
+})->middleware('auth');
 });

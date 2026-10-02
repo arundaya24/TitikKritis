@@ -7,10 +7,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, HasRoles, Notifiable;
 
     protected $fillable = [
         'name',
@@ -83,31 +82,31 @@ class User extends Authenticatable
     // ===== ROLE METHODS =====
     public function isSuperAdmin()
     {
-        return $this->role === 'super_admin';
+        return $this->hasRole('superadmin');
     }
 
     public function isAdmin()
     {
-        return $this->role === 'admin' || $this->role === 'super_admin';
+        return $this->hasAnyRole(['admin', 'superadmin']);
     }
 
     public function isRegularAdmin()
     {
-        return $this->role === 'admin';
+        return $this->hasRole('admin');
     }
 
     public function isUser()
     {
-        return $this->role === 'user';
+        return $this->hasRole('user');
     }
 
     public function canManageAdmins()
     {
-        return $this->role === 'super_admin';
+        return $this->hasRole('superadmin');
     }
 
     public function canCreateSuperAdmin()
     {
-        return $this->role === 'super_admin';
+        return $this->hasRole('superadmin');
     }
 }
