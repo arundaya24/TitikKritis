@@ -58,8 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/critique/create', [CritiqueController::class, 'create'])->name('critique.create');
     Route::post('/critique', [CritiqueController::class, 'store'])->name('critique.store');
     Route::get('/critique/{id}', [CritiqueController::class, 'show'])->name('critique.show');
-    Route::post('/critique/{id}/message', [CritiqueController::class, 'message'])
-        ->name('critique.message');
+    Route::post('/critique/{id}/message', [CritiqueController::class, 'message'])->name('critique.message');
     Route::get('/critique/{id}/edit', [CritiqueController::class, 'edit'])->name('critique.edit');
     Route::put('/critique/{id}', [CritiqueController::class, 'update'])->name('critique.update');
     Route::delete('/critique/{id}', [CritiqueController::class, 'destroy'])->name('critique.destroy');
@@ -73,7 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/critique/delete-archived/{id}', [CritiqueController::class, 'deleteArchived'])->name('critique.delete.archived');
 });
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin|superadmin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/critiques', [AdminCritiqueController::class, 'index'])->name('critiques.index');
