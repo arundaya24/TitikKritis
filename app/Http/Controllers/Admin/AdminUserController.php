@@ -13,24 +13,33 @@ class AdminUserController extends Controller
 {
     public function index()
     {
-        $admins = User::whereIn('role', ['admin', 'super_admin'])
-            ->orderByRaw("FIELD(role, 'super_admin', 'admin')")
+        $admins = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['admin', 'superadmin']);
+        })
+            ->with('roles')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $totalAdmins = User::where('role', 'admin')->count();
-        $totalSuperAdmins = User::where('role', 'super_admin')->count();
+        $totalAdmins = User::role('admin')->count();
+        $totalSuperAdmins = User::role('superadmin')->count();
 
-        return view('admin.users.index', compact('admins', 'totalAdmins', 'totalSuperAdmins'));
+        return view('admin.users.index', compact(
+            'admins',
+            'totalAdmins',
+            'totalSuperAdmins'
+        ));
     }
 
     public function create()
     {
         $provinces = Province::orderBy('name')->get();
-        // Cek apakah user yang login bisa membuat super admin
-        $canCreateSuperAdmin = auth()->user()->canCreateSuperAdmin();
 
-        return view('admin.users.create', compact('provinces', 'canCreateSuperAdmin'));
+        $canCreateSuperAdmin = auth()->user()->hasRole('superadmin');
+
+        return view('admin.users.create', compact(
+            'provinces',
+            'canCreateSuperAdmin'
+        ));
     }
 
     public function store(Request $request)
@@ -54,17 +63,15 @@ class AdminUserController extends Controller
                 ->withInput();
         }
 
-        // Tentukan role
         $role = $request->role ?? 'admin';
 
-        // Hanya super admin yang bisa membuat super admin
-        if ($role === 'super_admin' && ! auth()->user()->canCreateSuperAdmin()) {
+        if ($role === 'super_admin' && !auth()->user()->hasRole('superadmin')) {
             return redirect()->back()
                 ->with('error', 'Anda tidak memiliki izin untuk membuat Super Admin!')
                 ->withInput();
         }
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
@@ -74,33 +81,36 @@ class AdminUserController extends Controller
             'regency_id' => $request->regency_id,
             'district_id' => $request->district_id,
             'address' => $request->address,
-            'role' => $role,
+        ]);
+
+        $user->syncRoles([
+            $role === 'super_admin' ? 'superadmin' : 'admin'
         ]);
 
         $roleName = $role === 'super_admin' ? 'Super Admin' : 'Admin';
 
         return redirect()->route('admin.users.index')
-            ->with('success', $roleName.' berhasil ditambahkan!');
+            ->with('success', $roleName . ' berhasil ditambahkan!');
     }
 
     public function destroy($id)
     {
         $user = User::findOrFail($id);
 
-        // Tidak bisa hapus diri sendiri
         if ($user->id === auth()->id()) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Anda tidak dapat menghapus akun sendiri!');
         }
 
-        // Hanya super admin yang bisa hapus super admin
-        if ($user->role === 'super_admin' && ! auth()->user()->canManageAdmins()) {
+        if ($user->hasRole('superadmin') && !auth()->user()->hasRole('superadmin')) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Hanya Super Admin yang bisa menghapus Super Admin!');
         }
 
-        // Cek apakah user yang dihapus adalah user terakhir dengan role admin/super_admin
-        $adminCount = User::whereIn('role', ['admin', 'super_admin'])->count();
+        $adminCount = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['admin', 'superadmin']);
+        })->count();
+
         if ($adminCount <= 1) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Tidak dapat menghapus admin terakhir! Minimal harus ada 1 admin.');
@@ -116,38 +126,34 @@ class AdminUserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Tidak bisa turunkan diri sendiri
         if ($user->id === auth()->id()) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Anda tidak dapat menurunkan role sendiri!');
         }
 
-        // Hanya super admin yang bisa turunkan super admin
-        if ($user->role === 'super_admin' && ! auth()->user()->canManageAdmins()) {
+        if ($user->hasRole('superadmin') && !auth()->user()->hasRole('superadmin')) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Hanya Super Admin yang bisa menurunkan Super Admin!');
         }
 
-        // Cek apakah user yang diturunkan adalah user terakhir dengan role admin/super_admin
-        $adminCount = User::whereIn('role', ['admin', 'super_admin'])->count();
+        $adminCount = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['admin', 'superadmin']);
+        })->count();
+
         if ($adminCount <= 1) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Tidak dapat menurunkan admin terakhir! Minimal harus ada 1 admin.');
         }
 
-        // Turunkan ke user biasa
-        $user->role = 'user';
-        $user->save();
+        $user->syncRoles(['user']);
 
         return redirect()->route('admin.users.index')
-            ->with('success', $user->name.' berhasil diturunkan menjadi user biasa!');
+            ->with('success', $user->name . ' berhasil diturunkan menjadi user biasa!');
     }
 
-    // ===== PROMOTE: User/Admin menjadi Super Admin =====
     public function promote($id)
     {
-        // Hanya super admin yang bisa promote
-        if (! auth()->user()->canCreateSuperAdmin()) {
+        if (!auth()->user()->hasRole('superadmin')) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Hanya Super Admin yang bisa membuat Super Admin baru!');
         }
@@ -159,10 +165,9 @@ class AdminUserController extends Controller
                 ->with('error', 'Anda sudah Super Admin!');
         }
 
-        $user->role = 'super_admin';
-        $user->save();
+        $user->syncRoles(['superadmin']);
 
         return redirect()->route('admin.users.index')
-            ->with('success', $user->name.' berhasil dijadikan Super Admin!');
+            ->with('success', $user->name . ' berhasil dijadikan Super Admin!');
     }
 }

@@ -10,20 +10,22 @@
                         <i class="fas fa-arrow-left"></i> Kembali
                     </a>
                 </div>
+
                 <div class="card-body">
-                    {{-- Profile --}}
                     <div class="row mb-4">
                         <div class="col-md-3 text-center">
-                            <div
-                                style="width:100px;height:100px;border-radius:50%;background:#0d6efd;color:white;display:flex;align-items:center;justify-content:center;font-size:3rem;margin:0 auto;">
+                            <div style="width:100px;height:100px;border-radius:50%;background:#0d6efd;color:white;display:flex;align-items:center;justify-content:center;font-size:3rem;margin:0 auto;">
                                 {{ strtoupper(substr($user->name, 0, 1)) }}
                             </div>
+
                             <h5 class="mt-3">{{ $user->name }}</h5>
                             <p class="text-muted">{{ $user->username }}</p>
-                            <span class="badge {{ $user->role === 'admin' ? 'bg-danger' : 'bg-info' }}">
-                                {{ ucfirst($user->role) }}
+
+                            <span class="badge bg-info">
+                                {{ ucfirst($user->getRoleNames()->first() ?? 'user') }}
                             </span>
                         </div>
+
                         <div class="col-md-9">
                             <div class="row">
                                 <div class="col-md-6">
@@ -32,6 +34,7 @@
                                     <p><strong><i class="fas fa-calendar"></i> Bergabung:</strong>
                                         {{ $user->created_at->format('d F Y H:i') }}</p>
                                 </div>
+
                                 <div class="col-md-6">
                                     <p><strong><i class="fas fa-map-marker-alt"></i> Provinsi:</strong>
                                         {{ $user->province->name ?? '-' }}</p>
@@ -47,7 +50,6 @@
 
                     <hr>
 
-                    {{-- Statistik Kritik --}}
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
                             <div class="card bg-primary text-white">
@@ -57,6 +59,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-md-3">
                             <div class="card bg-warning text-dark">
                                 <div class="card-body text-center">
@@ -65,6 +68,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-md-3">
                             <div class="card bg-info text-white">
                                 <div class="card-body text-center">
@@ -73,6 +77,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-md-3">
                             <div class="card bg-success text-white">
                                 <div class="card-body text-center">
@@ -83,8 +88,8 @@
                         </div>
                     </div>
 
-                    {{-- Daftar Kritik User --}}
                     <h5><i class="fas fa-list me-2"></i> Daftar Kritik</h5>
+
                     @if($user->critiques->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -98,6 +103,7 @@
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     @foreach($user->critiques as $index => $critique)
                                         <tr>
@@ -112,7 +118,7 @@
                                             <td>{{ $critique->submitted_at->format('d/m/Y H:i') }}</td>
                                             <td>
                                                 <a href="{{ route('admin.critiques.show', $critique->id) }}"
-                                                    class="btn btn-sm btn-info">
+                                                   class="btn btn-sm btn-info">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                             </td>

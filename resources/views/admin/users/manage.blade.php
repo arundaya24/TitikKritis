@@ -6,6 +6,7 @@
             <span><i class="fas fa-users me-2"></i> Manajemen User</span>
             <span class="badge bg-primary">{{ $totalUsers }} Total User</span>
         </div>
+
         <div class="card-body">
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show">
@@ -21,56 +22,58 @@
                 </div>
             @endif
 
-            {{-- Statistik --}}
-<div class="row g-3 mb-4">
-    <div class="col-md">
-        <div class="card bg-primary text-light">
-            <div class="card-body text-center bg-primary" style="border-radius: 10px;">
-                <h5 class="card-title">Total User</h5>
-                <h2>{{ $totalUsers }}</h2>
-                <small>Semua user terdaftar</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md">
-        <div class="card bg-success text-light">
-            <div class="card-body text-center bg-success" style="border-radius: 10px;">
-                <h5 class="card-title">User Aktif</h5>
-                <h2>{{ $activeUsers }}</h2>
-                <small>Pernah kirim kritik</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md">
-        <div class="card bg-info text-light">
-            <div class="card-body text-center bg-info" style="border-radius: 10px;">
-                <h5 class="card-title">Total Admin</h5>
-                <h2>{{ $totalAdmins }}</h2>
-                <small>Role administrator</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md">
-        <div class="card bg-secondary text-light">
-            <div class="card-body text-center bg-secondary" style="border-radius: 10px;">
-                <h5 class="card-title">Total Super Admin</h5>
-                <h2>{{ $totalSuperAdmins }}</h2>
-                <small>Role super administrator</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md">
-        <div class="card bg-warning text-light">
-            <div class="card-body text-center bg-warning" style="border-radius: 10px;">
-                <h5 class="card-title">Total Kritik</h5>
-                <h2>{{ $totalCritiques }}</h2>
-                <small>Semua kritik terkirim</small>
-            </div>
-        </div>
-    </div>
-</div>
+            <div class="row g-3 mb-4">
+                <div class="col-md">
+                    <div class="card bg-primary text-light">
+                        <div class="card-body text-center bg-primary" style="border-radius: 10px;">
+                            <h5 class="card-title">Total User</h5>
+                            <h2>{{ $totalUsers }}</h2>
+                            <small>Semua user terdaftar</small>
+                        </div>
+                    </div>
+                </div>
 
-            {{-- Tabel User --}}
+                <div class="col-md">
+                    <div class="card bg-success text-light">
+                        <div class="card-body text-center bg-success" style="border-radius: 10px;">
+                            <h5 class="card-title">User Aktif</h5>
+                            <h2>{{ $activeUsers }}</h2>
+                            <small>Pernah kirim kritik</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md">
+                    <div class="card bg-info text-light">
+                        <div class="card-body text-center bg-info" style="border-radius: 10px;">
+                            <h5 class="card-title">Total Admin</h5>
+                            <h2>{{ $totalAdmins }}</h2>
+                            <small>Role administrator</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md">
+                    <div class="card bg-secondary text-light">
+                        <div class="card-body text-center bg-secondary" style="border-radius: 10px;">
+                            <h5 class="card-title">Total Super Admin</h5>
+                            <h2>{{ $totalSuperAdmins }}</h2>
+                            <small>Role super administrator</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md">
+                    <div class="card bg-warning text-light">
+                        <div class="card-body text-center bg-warning" style="border-radius: 10px;">
+                            <h5 class="card-title">Total Kritik</h5>
+                            <h2>{{ $totalCritiques }}</h2>
+                            <small>Semua kritik terkirim</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             @if ($users->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -87,6 +90,7 @@
                                 <th>Aksi</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             @foreach ($users as $index => $user)
                                 <tr>
@@ -94,31 +98,44 @@
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->username }}</td>
                                     <td>{{ $user->email }}</td>
+
                                     <td>
                                         <span class="badge bg-info">
-                                            {{ ucfirst($user->role) }}
+                                            {{ ucfirst($user->getRoleNames()->first() ?? 'user') }}
                                         </span>
                                     </td>
+
                                     <td>{{ $user->province->name ?? '-' }}</td>
+
                                     <td>
-                                        <span class="badge bg-primary">{{ $user->critiques_count ?? 0 }}</span>
+                                        <span class="badge bg-primary">
+                                            {{ $user->critiques_count ?? 0 }}
+                                        </span>
                                     </td>
+
                                     <td>{{ $user->created_at->format('d/m/Y') }}</td>
+
                                     <td>
                                         <div class="d-flex gap-2">
-                                            <a href="{{ route('admin.users.detail', $user->id) }}" class="btn btn-info btn-sm">
+                                            <a href="{{ route('admin.users.detail', $user->id) }}"
+                                               class="btn btn-info btn-sm">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+
                                             @if ($user->id !== auth()->id())
-                                                <a href="{{ route('admin.users.toggle', $user->id) }}" class="btn btn-success btn-sm"
-                                                    onclick="return confirm('Jadikan user ini sebagai Admin?')">
+                                                <a href="{{ route('admin.users.toggle', $user->id) }}"
+                                                   class="btn btn-success btn-sm"
+                                                   onclick="return confirm('Jadikan user ini sebagai Admin?')">
                                                     <i class="fas fa-user-shield"></i>
                                                 </a>
-                                                <form action="{{ route('admin.users.delete', $user->id) }}" method="POST"
-                                                    class="d-inline"
-                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus user ini beserta semua kritiknya?')">
+
+                                                <form action="{{ route('admin.users.delete', $user->id) }}"
+                                                      method="POST"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus user ini beserta semua kritiknya?')">
                                                     @csrf
                                                     @method('DELETE')
+
                                                     <button type="submit" class="btn btn-danger btn-sm">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
@@ -133,6 +150,7 @@
                         </tbody>
                     </table>
                 </div>
+
                 <div class="d-flex justify-content-center">
                     {{ $users->links() }}
                 </div>
