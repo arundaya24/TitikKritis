@@ -37,19 +37,25 @@ class AdminDashboardController extends Controller
             })
             ->map(function ($critiques) {
                 return $critiques->count();
-            });
+            })
+            ->sortDesc();
 
         $monthlyCritiques = Critique::where(
             'created_at',
             '>=',
             now()->subMonths(5)->startOfMonth()
         )
-        ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, COUNT(*) as total')
-        ->groupByRaw('YEAR(created_at), MONTH(created_at)')
-        ->orderByRaw('YEAR(created_at), MONTH(created_at)')
-        ->get();
+            ->selectRaw(
+                'MONTH(created_at) as month, YEAR(created_at) as year, COUNT(*) as total'
+            )
+            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
+            ->orderByRaw('YEAR(created_at), MONTH(created_at)')
+            ->get();
 
-        $recentCritiques = Critique::with(['user', 'category'])
+        $recentCritiques = Critique::with([
+            'user',
+            'category',
+        ])
             ->latest()
             ->take(5)
             ->get();
