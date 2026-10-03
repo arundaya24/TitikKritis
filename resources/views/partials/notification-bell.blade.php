@@ -108,52 +108,107 @@
             </span>
         @endif
     </a>
+
     <ul class="dropdown-menu dropdown-menu-end notif-dropdown-menu" aria-labelledby="notifDropdown">
         <li class="d-flex justify-content-between align-items-center px-3 py-2">
             <span class="fw-bold">Notifikasi</span>
+
             <div class="notif-header-actions">
                 @if ($__unreadCount > 0)
                     <form action="{{ route('notifications.read.all') }}" method="POST" class="m-0">
                         @csrf
-                        <button type="submit" class="btn btn-link btn-sm p-0">Tandai semua dibaca</button>
+                        <button type="submit" class="btn btn-link btn-sm p-0">
+                            Tandai semua dibaca
+                        </button>
                     </form>
                 @endif
+
                 @if ($__notifications->isNotEmpty())
                     <form action="{{ route('notifications.destroy.all') }}" method="POST" class="m-0"
                         onsubmit="return confirm('Hapus semua notifikasi?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-link btn-sm p-0 text-danger">Hapus semua</button>
+                        <button type="submit" class="btn btn-link btn-sm p-0 text-danger">
+                            Hapus semua
+                        </button>
                     </form>
                 @endif
             </div>
         </li>
+
         <li>
             <hr class="dropdown-divider m-0">
         </li>
+
         @forelse ($__notifications as $notif)
             <li class="notif-item-wrapper">
-                <form action="{{ route('notifications.read', $notif->id) }}" method="POST" class="m-0 flex-grow-1">
+                <form action="{{ route('notifications.read', $notif->id) }}" method="POST"
+                    class="m-0 flex-grow-1">
                     @csrf
+
                     <button type="submit"
                         class="dropdown-item notif-item {{ is_null($notif->read_at) ? 'notif-unread' : '' }} py-2">
-                        <div class="small">{{ $notif->data['message'] ?? 'Notifikasi' }}</div>
+                        <div class="small">
+                            {{ $notif->data['message'] ?? 'Notifikasi' }}
+                        </div>
+
                         <div class="text-muted" style="font-size: 0.75rem;">
                             {{ $notif->created_at->diffForHumans() }}
                         </div>
                     </button>
                 </form>
+
                 <form action="{{ route('notifications.destroy', $notif->id) }}" method="POST"
                     class="m-0 notif-delete-form">
                     @csrf
                     @method('DELETE')
+
                     <button type="submit" class="notif-delete-btn" title="Hapus notifikasi">
                         <i class="fas fa-times"></i>
                     </button>
                 </form>
             </li>
         @empty
-            <li><span class="dropdown-item-text text-muted small px-3 py-3 d-block">Belum ada notifikasi</span></li>
+            <li>
+                <span class="dropdown-item-text text-muted small px-3 py-3 d-block">
+                    Belum ada notifikasi
+                </span>
+            </li>
         @endforelse
     </ul>
 </div>
+
+@if (auth()->check())
+    <script>
+        window.currentUserId = {{ auth()->id() }};
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!window.Echo || !window.currentUserId) {
+                return;
+            }
+
+            window.Echo.private(`App.Models.User.${window.currentUserId}`)
+                .notification((notification) => {
+                    console.log('Notifikasi realtime:', notification);
+
+                    const badge = document.querySelector('.notif-badge');
+
+                    if (badge) {
+                        let count = parseInt(badge.textContent) || 0;
+                        badge.textContent = count >= 9 ? '9+' : count + 1;
+                    } else {
+                        const bell = document.querySelector('.notif-bell-link');
+
+                        if (bell) {
+                            const newBadge = document.createElement('span');
+
+                            newBadge.className = 'badge rounded-pill bg-danger notif-badge';
+                            newBadge.textContent = '1';
+
+                            bell.appendChild(newBadge);
+                        }
+                    }
+                });
+        });
+    </script>
+@endif

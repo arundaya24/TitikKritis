@@ -227,10 +227,14 @@ class CritiqueController extends Controller
             'note' => 'Kritik dikirim oleh pengguna',
         ]);
 
-        $admins = User::whereIn('role', [
-            'admin',
-            'super_admin',
-        ])->get();
+        $admins = User::role(['admin', 'superadmin'])->get();
+
+        if ($admins->isNotEmpty()) {
+            Notification::send(
+                $admins,
+                new NewCritiqueSubmitted($critique)
+            );
+        }
 
         if ($admins->isNotEmpty()) {
             Notification::send(

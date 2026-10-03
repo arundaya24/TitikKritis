@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Critique;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class CritiqueStatusUpdated extends Notification
@@ -18,18 +19,20 @@ class CritiqueStatusUpdated extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage($this->toDatabase($notifiable));
     }
 
     public function toDatabase(object $notifiable): array
     {
         return [
             'type' => 'critique_status_updated',
-
             'critique_id' => $this->critique->id,
-
             'title' => $this->critique->title,
-
             'message' =>
                 'Status laporan "' .
                 $this->critique->title .
@@ -38,7 +41,6 @@ class CritiqueStatusUpdated extends Notification
                 '" menjadi "' .
                 ucfirst($this->newStatus) .
                 '".',
-
             'url' => route(
                 'critique.show',
                 $this->critique->id
