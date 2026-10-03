@@ -9,6 +9,7 @@ use App\Models\District;
 use App\Models\Province;
 use App\Models\Regency;
 use App\Models\User;
+use App\Notifications\CritiqueResponded;
 use App\Notifications\NewCritiqueSubmitted;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -228,13 +229,6 @@ class CritiqueController extends Controller
         ]);
 
         $admins = User::role(['admin', 'superadmin'])->get();
-
-        if ($admins->isNotEmpty()) {
-            Notification::send(
-                $admins,
-                new NewCritiqueSubmitted($critique)
-            );
-        }
 
         if ($admins->isNotEmpty()) {
             Notification::send(
@@ -605,14 +599,7 @@ class CritiqueController extends Controller
         if (in_array($critique->status, ['selesai', 'ditolak'])) {
             return back()->with(
                 'error',
-                'Laporan ini sudah ditutup dan tidak dapat dibalas lagi.'
-            );
-        }
-
-        if (! $critique->user_can_reply) {
-            return back()->with(
-                'error',
-                'Anda belum dapat membalas. Tunggu admin mengubah status laporan.'
+                'Laporan ini sudah selesai dan tidak dapat dibalas lagi.'
             );
         }
 
@@ -620,14 +607,19 @@ class CritiqueController extends Controller
             'message' => 'required|string|min:1|max:5000',
         ]);
 
-        $critique->messages()->create([
+        $message = $critique->messages()->create([
             'user_id' => Auth::id(),
-            'message' => $request->input('message'),
+            'message' => $request->message,
         ]);
 
-        $critique->update([
-            'user_can_reply' => false,
-        ]);
+        $admins = User::role(['admin', 'superadmin'])->get();
+
+        if ($admins->isNotEmpty()) {
+            Notification::send(
+                $admins,
+                new CritiqueResponded($critique, $message)
+            );
+        }
 
         return back()->with(
             'success',

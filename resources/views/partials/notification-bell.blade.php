@@ -102,6 +102,7 @@
     <a class="nav-link notif-bell-link d-inline-block" href="#" id="notifDropdown" role="button"
         data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi">
         <i class="fas fa-bell"></i>
+
         @if ($__unreadCount > 0)
             <span class="badge rounded-pill bg-danger notif-badge">
                 {{ $__unreadCount > 9 ? '9+' : $__unreadCount }}
@@ -170,7 +171,7 @@
             </li>
         @empty
             <li>
-                <span class="dropdown-item-text text-muted small px-3 py-3 d-block">
+                <span class="dropdown-item-text text-muted small px-3 py-3 d-block notif-empty">
                     Belum ada notifikasi
                 </span>
             </li>
@@ -180,35 +181,10 @@
 
 @if (auth()->check())
     <script>
-        window.currentUserId = {{ auth()->id() }};
+        window.currentUserId = @json(auth()->id());
 
-        document.addEventListener('DOMContentLoaded', function () {
-            if (!window.Echo || !window.currentUserId) {
-                return;
-            }
-
-            window.Echo.private(`App.Models.User.${window.currentUserId}`)
-                .notification((notification) => {
-                    console.log('Notifikasi realtime:', notification);
-
-                    const badge = document.querySelector('.notif-badge');
-
-                    if (badge) {
-                        let count = parseInt(badge.textContent) || 0;
-                        badge.textContent = count >= 9 ? '9+' : count + 1;
-                    } else {
-                        const bell = document.querySelector('.notif-bell-link');
-
-                        if (bell) {
-                            const newBadge = document.createElement('span');
-
-                            newBadge.className = 'badge rounded-pill bg-danger notif-badge';
-                            newBadge.textContent = '1';
-
-                            bell.appendChild(newBadge);
-                        }
-                    }
-                });
-        });
+        window.notificationReadUrlTemplate = @json(
+            route('notifications.read', ['id' => '__NOTIFICATION_ID__'])
+        );
     </script>
 @endif

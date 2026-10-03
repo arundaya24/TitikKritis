@@ -9,6 +9,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
+    @auth
+        <script>
+            window.currentUserId = @json(auth()->id());
+        </script>
+    @endauth
+
+    @vite('resources/js/app.js')
     <style>
         body {
             background-color: #f4f6f9;
@@ -621,14 +628,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            setTimeout(function() {
+        $(document).ready(function () {
+            setTimeout(function () {
                 $('.alert').fadeOut('slow');
             }, 5000);
         });
 
         // Dark Mode Toggle for Admin
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const toggle = document.getElementById('adminThemeToggle');
             const icon = document.getElementById('adminThemeIcon');
 
@@ -639,7 +646,7 @@
                 toggle.innerHTML = '<i class="fas fa-sun"></i> Mode Terang';
             }
 
-            toggle.addEventListener('click', function() {
+            toggle.addEventListener('click', function () {
                 document.body.classList.toggle('dark-mode');
 
                 if (document.body.classList.contains('dark-mode')) {

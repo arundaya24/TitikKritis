@@ -8,6 +8,7 @@ use App\Models\Critique;
 use App\Models\CritiqueHistory;
 use App\Models\Response;
 use App\Notifications\CritiqueResponded;
+use App\Notifications\CritiqueStatusUpdated;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -203,8 +204,8 @@ class AdminCritiqueController extends Controller
         ];
 
         if (
-            ! isset($allowedTransitions[$oldStatus]) ||
-            ! in_array(
+            !isset($allowedTransitions[$oldStatus]) ||
+            !in_array(
                 $newStatus,
                 $allowedTransitions[$oldStatus]
             )
@@ -224,7 +225,7 @@ class AdminCritiqueController extends Controller
 
         $critique->update([
             'status' => $newStatus,
-            'user_can_reply' => ! $isClosed,
+            'user_can_reply' => !$isClosed,
         ]);
 
         CritiqueHistory::create([
@@ -234,6 +235,16 @@ class AdminCritiqueController extends Controller
             'changed_by' => Auth::id(),
             'note' => 'Status diubah oleh admin',
         ]);
+
+        if ($critique->user) {
+            $critique->user->notify(
+                new CritiqueStatusUpdated(
+                    $critique,
+                    $oldStatus,
+                    $newStatus
+                )
+            );
+        }
 
         return redirect()
             ->route(
@@ -309,7 +320,7 @@ class AdminCritiqueController extends Controller
             ->route('admin.critiques.index')
             ->with(
                 'success',
-                'Kritik yang ditolak berhasil dihapus!'
+                'Kritik yang ditolak berhasil dihapus.'
             );
     }
 
@@ -327,7 +338,7 @@ class AdminCritiqueController extends Controller
             ->route('admin.critiques.index')
             ->with(
                 'success',
-                'Kritik berhasil diarsipkan!'
+                'Kritik berhasil diarsipkan.'
             );
     }
 
@@ -345,7 +356,7 @@ class AdminCritiqueController extends Controller
             ->route('admin.critiques.archive.index')
             ->with(
                 'success',
-                'Kritik berhasil dikembalikan dari arsip!'
+                'Kritik berhasil dikembalikan dari arsip.'
             );
     }
 
@@ -368,7 +379,7 @@ class AdminCritiqueController extends Controller
             ->route('admin.critiques.archive.index')
             ->with(
                 'success',
-                'Kritik arsip berhasil dihapus!'
+                'Kritik arsip berhasil dihapus.'
             );
     }
 
