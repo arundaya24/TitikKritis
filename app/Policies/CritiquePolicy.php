@@ -18,6 +18,10 @@ class CritiquePolicy
         return $user->can('create reports');
     }
 
+    // PERBAIKAN: pengecekan status 'dikirim' dihapus dari policy.
+    // Sebelumnya archive, unarchive, forceDelete, dan deleteArchived selalu 403
+    // karena memanggil authorize('update'/'delete') pada kritik berstatus selesai/ditolak.
+    // Pembatasan status tetap dijaga di controller (edit, update, destroy, dan where() pada aksi lain).
     public function update(User $user, Critique $critique)
     {
         if ($user->hasAnyRole(['admin', 'superadmin'])) {
@@ -25,8 +29,7 @@ class CritiquePolicy
         }
 
         return $user->can('update reports')
-            && $user->id === $critique->user_id
-            && $critique->status === 'dikirim';
+            && $user->id === $critique->user_id;
     }
 
     public function delete(User $user, Critique $critique)
@@ -36,8 +39,7 @@ class CritiquePolicy
         }
 
         return $user->can('delete reports')
-            && $user->id === $critique->user_id
-            && $critique->status === 'dikirim';
+            && $user->id === $critique->user_id;
     }
 
     public function viewAny(User $user)

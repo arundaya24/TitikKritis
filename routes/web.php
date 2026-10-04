@@ -24,15 +24,15 @@ Route::middleware('guest')->group(function () {
     });
 
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
 
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [RegisterController::class, 'register']);
+    Route::post('/register', [RegisterController::class, 'register'])->middleware('throttle:5,1');
 
     Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
-    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->middleware('throttle:5,1')->name('password.email');
     Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
-    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
+    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->middleware('throttle:5,1')->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {
@@ -97,14 +97,9 @@ Route::middleware(['auth', 'role:admin|superadmin'])->prefix('admin')->name('adm
     Route::get('/users/manage', [AdminUserManagementController::class, 'index'])->name('users.manage');
     Route::get('/users/detail/{id}', [AdminUserManagementController::class, 'show'])->name('users.detail');
     Route::delete('/users/delete/{id}', [AdminUserManagementController::class, 'destroy'])->name('users.delete');
-    Route::get('/users/toggle/{id}', [AdminUserManagementController::class, 'toggleAdmin'])->name('users.toggle');
 
-    Route::get('/test-session', function () {
-    return [
-        'session_id' => session()->getId(),
-        'user_id' => auth()->id(),
-        'username' => auth()->user()?->username,
-        'roles' => auth()->user()?->getRoleNames(),
-    ];
-})->middleware('auth');
+    // PERBAIKAN: sebelumnya GET (rawan CSRF). Sekarang PUT; tombol di Blade harus berupa form.
+    Route::put('/users/toggle/{id}', [AdminUserManagementController::class, 'toggleAdmin'])->name('users.toggle');
+
+    // Route /test-session dihapus (hanya untuk debugging).
 });

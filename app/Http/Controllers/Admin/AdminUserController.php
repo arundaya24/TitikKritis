@@ -103,11 +103,15 @@ class AdminUserController extends Controller
                 ->with('error', 'Hanya Super Admin yang bisa menghapus Super Admin!');
         }
 
-        $adminCount = User::role(['admin', 'superadmin'])->count();
+        // PERBAIKAN: pengecekan admin terakhir hanya berlaku jika target memang admin.
+        // Sebelumnya menghapus user biasa ikut diblokir saat hanya ada 1 admin.
+        if ($user->hasAnyRole(['admin', 'superadmin'])) {
+            $adminCount = User::role(['admin', 'superadmin'])->count();
 
-        if ($adminCount <= 1) {
-            return redirect()->route('admin.users.index')
-                ->with('error', 'Tidak dapat menghapus admin terakhir! Minimal harus ada 1 admin.');
+            if ($adminCount <= 1) {
+                return redirect()->route('admin.users.index')
+                    ->with('error', 'Tidak dapat menghapus admin terakhir! Minimal harus ada 1 admin.');
+            }
         }
 
         $user->delete();
@@ -130,11 +134,14 @@ class AdminUserController extends Controller
                 ->with('error', 'Hanya Super Admin yang bisa menurunkan Super Admin!');
         }
 
-        $adminCount = User::role(['admin', 'superadmin'])->count();
+        // PERBAIKAN: pengecekan admin terakhir hanya berlaku jika target memang admin.
+        if ($user->hasAnyRole(['admin', 'superadmin'])) {
+            $adminCount = User::role(['admin', 'superadmin'])->count();
 
-        if ($adminCount <= 1) {
-            return redirect()->route('admin.users.index')
-                ->with('error', 'Tidak dapat menurunkan admin terakhir! Minimal harus ada 1 admin.');
+            if ($adminCount <= 1) {
+                return redirect()->route('admin.users.index')
+                    ->with('error', 'Tidak dapat menurunkan admin terakhir! Minimal harus ada 1 admin.');
+            }
         }
 
         $user->syncRoles(['user']);
