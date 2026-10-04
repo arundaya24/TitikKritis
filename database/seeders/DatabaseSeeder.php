@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             RegencySeeder::class,
             DistrictSeeder::class,
             CategorySeeder::class,
+            RolePermissionSeeder::class,
         ]);
     }
 }

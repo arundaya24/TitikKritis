@@ -13,9 +13,7 @@ class AdminUserController extends Controller
 {
     public function index()
     {
-        $admins = User::whereHas('roles', function ($query) {
-            $query->whereIn('name', ['admin', 'superadmin']);
-        })
+        $admins = User::role(['admin', 'superadmin'])
             ->with('roles')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -54,7 +52,7 @@ class AdminUserController extends Controller
             'regency_id' => 'required|exists:regencies,id',
             'district_id' => 'required|exists:districts,id',
             'address' => 'nullable|string',
-            'role' => 'nullable|in:admin,super_admin',
+            'role' => 'nullable|in:admin,superadmin',
         ]);
 
         if ($validator->fails()) {
@@ -65,7 +63,7 @@ class AdminUserController extends Controller
 
         $role = $request->role ?? 'admin';
 
-        if ($role === 'super_admin' && !auth()->user()->hasRole('superadmin')) {
+        if ($role === 'superadmin' && !auth()->user()->hasRole('superadmin')) {
             return redirect()->back()
                 ->with('error', 'Anda tidak memiliki izin untuk membuat Super Admin!')
                 ->withInput();
@@ -83,11 +81,9 @@ class AdminUserController extends Controller
             'address' => $request->address,
         ]);
 
-        $user->syncRoles([
-            $role === 'super_admin' ? 'superadmin' : 'admin'
-        ]);
+        $user->syncRoles([$role]);
 
-        $roleName = $role === 'super_admin' ? 'Super Admin' : 'Admin';
+        $roleName = $role === 'superadmin' ? 'Super Admin' : 'Admin';
 
         return redirect()->route('admin.users.index')
             ->with('success', $roleName . ' berhasil ditambahkan!');
@@ -107,9 +103,7 @@ class AdminUserController extends Controller
                 ->with('error', 'Hanya Super Admin yang bisa menghapus Super Admin!');
         }
 
-        $adminCount = User::whereHas('roles', function ($query) {
-            $query->whereIn('name', ['admin', 'superadmin']);
-        })->count();
+        $adminCount = User::role(['admin', 'superadmin'])->count();
 
         if ($adminCount <= 1) {
             return redirect()->route('admin.users.index')
@@ -136,9 +130,7 @@ class AdminUserController extends Controller
                 ->with('error', 'Hanya Super Admin yang bisa menurunkan Super Admin!');
         }
 
-        $adminCount = User::whereHas('roles', function ($query) {
-            $query->whereIn('name', ['admin', 'superadmin']);
-        })->count();
+        $adminCount = User::role(['admin', 'superadmin'])->count();
 
         if ($adminCount <= 1) {
             return redirect()->route('admin.users.index')

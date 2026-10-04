@@ -20,7 +20,6 @@ class User extends Authenticatable
         'province_id',
         'regency_id',
         'district_id',
-        'role',
         'address',
         'avatar',
     ];

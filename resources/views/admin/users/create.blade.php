@@ -96,7 +96,7 @@
                     <select class="form-select" id="role" name="role" required>
                         <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                         @if ($canCreateSuperAdmin)
-                            <option value="super_admin" {{ old('role') == 'super_admin' ? 'selected' : '' }}>
+                            <option value="superadmin" {{ old('role') == 'superadmin' ? 'selected' : '' }}>
                                 Super Admin
                             </option>
                         @endif
