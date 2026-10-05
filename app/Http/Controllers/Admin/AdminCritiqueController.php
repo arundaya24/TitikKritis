@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\CritiqueUpdate;
 use App\Models\CritiqueUpdateFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+
 
 class AdminCritiqueController extends Controller
 {
@@ -160,83 +162,86 @@ class AdminCritiqueController extends Controller
         );
     }
 
+    /**
+     * Route lama (ubah status saja). Tetap dipertahankan agar route
+     * admin.critiques.status tidak error. Form baru memakai respond().
+     */
     public function updateStatus(Request $request, $id)
-{
-    $request->validate([
-        'status' => [
-            'required',
-            'in:dikirim,ditinjau,diproses,selesai,ditolak',
-        ],
-        'files' => [
-            'required',
-            'array',
-            'min:1',
-        ],
-        'files.*' => [
-            'file',
-            'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
-            'max:10240',
-        ],
-    ]);
-
-    $critique = Critique::findOrFail($id);
-
-    $oldStatus = $critique->status;
-    $newStatus = $request->input('status');
-
-    DB::transaction(function () use (
-        $request,
-        $critique,
-        $oldStatus,
-        $newStatus
-    ) {
-        $update = CritiqueUpdate::create([
-            'critique_id' => $critique->id,
-            'user_id' => Auth::id(),
-            'old_status' => $oldStatus,
-            'new_status' => $newStatus,
+    {
+        $request->validate([
+            'status' => [
+                'required',
+                'in:dikirim,ditinjau,diproses,selesai,ditolak',
+            ],
+            'files' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'files.*' => [
+                'file',
+                'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
+                'max:10240',
+            ],
         ]);
 
-        foreach ($request->file('files', []) as $file) {
-            $path = $file->store(
-                'critique_updates',
-                'public'
+        $critique = Critique::findOrFail($id);
+
+        DB::transaction(function () use ($request, $critique) {
+            $this->applyStatusChange($request, $critique);
+        });
+
+        return redirect()
+            ->back()
+            ->with(
+                'success',
+                'Status dan bukti berhasil diperbarui.'
             );
+    }
 
-            CritiqueUpdateFile::create([
-                'critique_update_id' => $update->id,
-                'file_path' => $path,
-                'original_name' => $file->getClientOriginalName(),
-            ]);
-        }
-
-        $critique->update([
-            'status' => $newStatus,
-        ]);
-
-        CritiqueHistory::create([
-            'critique_id' => $critique->id,
-            'old_status' => $oldStatus,
-            'new_status' => $newStatus,
-            'changed_by' => Auth::id(),
-            'note' => 'Status diperbarui oleh admin',
-        ]);
-    });
-
-    return redirect()
-        ->back()
-        ->with(
-            'success',
-            'Status dan bukti berhasil diperbarui.'
-        );
-}
-
+    /**
+     * Tindak lanjut gabungan:
+     * - tanggapan saja            -> boleh tanpa bukti
+     * - bukti (files)             -> wajib disertai tanggapan
+     * - ubah status               -> wajib bukti + tanggapan
+     */
     public function respond(Request $request, $id)
     {
         $critique = Critique::findOrFail($id);
 
+        $allowedStatuses = [
+            'dikirim'  => ['ditinjau', 'ditolak'],
+            'ditinjau' => ['diproses', 'ditolak'],
+            'diproses' => ['selesai'],
+        ][$critique->status] ?? [];
+
         $validator = Validator::make($request->all(), [
-            'content' => 'required|string|min:10',
+            'status' => [
+                'nullable',
+                Rule::in($allowedStatuses),
+            ],
+            'files' => [
+                'required_with:status',
+                'array',
+                'min:1',
+            ],
+            'files.*' => [
+                'file',
+                'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
+                'max:10240',
+            ],
+            'content' => [
+                'nullable',
+                'required_with:files,status',
+                'string',
+                'min:10',
+                'max:5000',
+            ],
+        ], [
+            'content.required_with' => 'Tanggapan wajib diisi jika mengunggah bukti atau mengubah status.',
+            'content.min'           => 'Tanggapan minimal 10 karakter.',
+            'files.required_with'   => 'Bukti wajib diunggah saat mengubah status.',
+            'status.in'             => 'Perubahan status tidak valid untuk status laporan saat ini.',
         ]);
 
         if ($validator->fails()) {
@@ -246,19 +251,28 @@ class AdminCritiqueController extends Controller
                 ->withInput();
         }
 
-        $content = $request->input('content');
+        if (
+            ! $request->filled('content')
+            && ! $request->filled('status')
+        ) {
+            return redirect()
+                ->back()
+                ->withErrors('Isi tanggapan atau pilih perubahan status.')
+                ->withInput();
+        }
 
-        Response::updateOrCreate(
-            [
-                'critique_id' => $critique->id,
-            ],
-            [
-                'admin_id' => Auth::id(),
-                'content' => $content,
-            ]
-        );
+        DB::transaction(function () use ($request, $critique) {
+            if ($request->filled('status')) {
+                $this->applyStatusChange($request, $critique);
+            }
 
-        if ($critique->user) {
+            if ($request->filled('content')) {
+                $this->saveResponse($request, $critique);
+            }
+        });
+
+        // Notifikasi dikirim setelah transaksi sukses
+        if ($request->filled('content') && $critique->user) {
             $critique->user->notify(
                 new CritiqueResponded($critique)
             );
@@ -271,8 +285,65 @@ class AdminCritiqueController extends Controller
             )
             ->with(
                 'success',
-                'Tanggapan berhasil dikirim!'
+                'Tindak lanjut berhasil disimpan!'
             );
+    }
+
+    /**
+     * Ubah status + simpan bukti + catat riwayat.
+     */
+    private function applyStatusChange(Request $request, Critique $critique): void
+    {
+        $oldStatus = $critique->status;
+        $newStatus = $request->input('status');
+
+        $update = CritiqueUpdate::create([
+            'critique_id' => $critique->id,
+            'user_id'     => Auth::id(),
+            'old_status'  => $oldStatus,
+            'new_status'  => $newStatus,
+        ]);
+
+        foreach ($request->file('files', []) as $file) {
+            $path = $file->store(
+                'critique_updates',
+                'public'
+            );
+
+            CritiqueUpdateFile::create([
+                'critique_update_id' => $update->id,
+                'file_path'          => $path,
+                'original_name'      => $file->getClientOriginalName(),
+            ]);
+        }
+
+        $critique->update([
+            'status' => $newStatus,
+        ]);
+
+        CritiqueHistory::create([
+            'critique_id' => $critique->id,
+            'old_status'  => $oldStatus,
+            'new_status'  => $newStatus,
+            'changed_by'  => Auth::id(),
+            'note'        => 'Status diperbarui oleh admin',
+        ]);
+    }
+
+    /**
+     * Simpan tanggapan admin (tanpa notifikasi; notifikasi dikirim di respond()).
+     */
+    private function saveResponse(Request $request, Critique $critique): void
+    {
+        Response::updateOrCreate(
+            [
+                'critique_id' => $critique->id,
+            ],
+            [
+                'admin_id' => Auth::id(),
+                'content'  => $request->input('content'),
+            ]
+        );
     }
 
     public function forceDelete($id)
