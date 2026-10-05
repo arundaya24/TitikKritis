@@ -159,7 +159,7 @@
                     </table>
                 </div>
                 <div class="d-flex justify-content-center">
-                    {{ $critiques->appends(request()->query())->links() }}
+                    {{ $critiques->appends(request()->query())->links('pagination::bootstrap-5') }}
                 </div>
             @else
                 <div class="text-center py-5">
