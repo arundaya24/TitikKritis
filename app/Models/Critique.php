@@ -38,7 +38,10 @@ class Critique extends Model
 
     public function updates()
     {
-        return $this->hasMany(CritiqueUpdate::class);
+        return $this->hasMany(
+            CritiqueUpdate::class,
+            'critique_id'
+        );
     }
 
     public function user()

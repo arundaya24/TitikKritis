@@ -14,10 +14,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Models\CritiqueUpdate;
+use App\Models\CritiqueUpdateFile;
+use Illuminate\Support\Facades\DB;
 
 class AdminCritiqueController extends Controller
 {
     use AuthorizesRequests;
+
 
     public function index(Request $request)
     {
@@ -157,75 +161,57 @@ class AdminCritiqueController extends Controller
     }
 
     public function updateStatus(Request $request, $id)
-    {
-        $critique = Critique::findOrFail($id);
+{
+    $request->validate([
+        'status' => [
+            'required',
+            'in:dikirim,ditinjau,diproses,selesai,ditolak',
+        ],
+        'files' => [
+            'required',
+            'array',
+            'min:1',
+        ],
+        'files.*' => [
+            'file',
+            'mimes:jpg,jpeg,png,webp,pdf,doc,docx',
+            'max:10240',
+        ],
+    ]);
 
-        $validator = Validator::make($request->all(), [
-            'status' => 'required|in:dikirim,ditinjau,diproses,selesai,ditolak',
+    $critique = Critique::findOrFail($id);
+
+    $oldStatus = $critique->status;
+    $newStatus = $request->input('status');
+
+    DB::transaction(function () use (
+        $request,
+        $critique,
+        $oldStatus,
+        $newStatus
+    ) {
+        $update = CritiqueUpdate::create([
+            'critique_id' => $critique->id,
+            'user_id' => Auth::id(),
+            'old_status' => $oldStatus,
+            'new_status' => $newStatus,
         ]);
 
-        if ($validator->fails()) {
-            return redirect()
-                ->back()
-                ->withErrors($validator)
-                ->withInput();
+        foreach ($request->file('files', []) as $file) {
+            $path = $file->store(
+                'critique_updates',
+                'public'
+            );
+
+            CritiqueUpdateFile::create([
+                'critique_update_id' => $update->id,
+                'file_path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+            ]);
         }
-
-        $oldStatus = $critique->status;
-        $newStatus = $request->input('status');
-
-        if ($oldStatus === $newStatus) {
-            return redirect()
-                ->route('admin.critiques.show', $critique->id)
-                ->with(
-                    'error',
-                    'Status tidak berubah.'
-                );
-        }
-
-        $allowedTransitions = [
-            'dikirim' => [
-                'ditinjau',
-                'ditolak',
-            ],
-
-            'ditinjau' => [
-                'diproses',
-                'ditolak',
-            ],
-
-            'diproses' => [
-                'selesai',
-            ],
-
-            'selesai' => [],
-
-            'ditolak' => [],
-        ];
-
-        if (
-            !isset($allowedTransitions[$oldStatus]) ||
-            !in_array(
-                $newStatus,
-                $allowedTransitions[$oldStatus]
-            )
-        ) {
-            return redirect()
-                ->back()
-                ->with(
-                    'error',
-                    "Status tidak dapat diubah dari {$oldStatus} menjadi {$newStatus}."
-                );
-        }
-
-        $isClosed = in_array(
-            $newStatus,
-            ['selesai', 'ditolak']
-        );
 
         $critique->update([
             'status' => $newStatus,
-            'user_can_reply' => !$isClosed,
         ]);
 
         CritiqueHistory::create([
@@ -233,29 +219,17 @@ class AdminCritiqueController extends Controller
             'old_status' => $oldStatus,
             'new_status' => $newStatus,
             'changed_by' => Auth::id(),
-            'note' => 'Status diubah oleh admin',
+            'note' => 'Status diperbarui oleh admin',
         ]);
+    });
 
-        if ($critique->user) {
-            $critique->user->notify(
-                new CritiqueStatusUpdated(
-                    $critique,
-                    $oldStatus,
-                    $newStatus
-                )
-            );
-        }
-
-        return redirect()
-            ->route(
-                'admin.critiques.show',
-                $critique->id
-            )
-            ->with(
-                'success',
-                'Status kritik berhasil diperbarui!'
-            );
-    }
+    return redirect()
+        ->back()
+        ->with(
+            'success',
+            'Status dan bukti berhasil diperbarui.'
+        );
+}
 
     public function respond(Request $request, $id)
     {

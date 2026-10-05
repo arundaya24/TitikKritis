@@ -6,29 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('critique_update_files', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('critique_update_id')
-                ->constrained()
+                ->constrained('critique_updates')
                 ->cascadeOnDelete();
 
             $table->string('file_path');
             $table->string('original_name');
-            $table->string('file_type')->nullable();
 
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('critique_update_files');

@@ -28,6 +28,9 @@ class CritiqueUpdate extends Model
 
     public function files()
     {
-        return $this->hasMany(CritiqueUpdateFile::class);
+        return $this->hasMany(
+            CritiqueUpdateFile::class,
+            'critique_update_id'
+        );
     }
 }
