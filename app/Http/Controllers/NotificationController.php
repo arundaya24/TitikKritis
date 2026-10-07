@@ -45,7 +45,7 @@ class NotificationController extends Controller
 
         return redirect()->back();
     }
-
+    // lorem ipsum dolor sit amet
     public function destroyAll(): RedirectResponse
     {
         Auth::user()->notifications()->delete();
