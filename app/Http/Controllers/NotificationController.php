@@ -46,9 +46,6 @@ class NotificationController extends Controller
         return redirect()->back();
     }
 
-    /**
-     * Hapus semua notifikasi milik user yang login.
-     */
     public function destroyAll(): RedirectResponse
     {
         Auth::user()->notifications()->delete();

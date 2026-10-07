@@ -136,7 +136,6 @@
                                                 <form action="{{ route('admin.users.destroy', $admin->id) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
-
                                                     <button type="submit"
                                                             class="btn btn-sm btn-danger"
                                                             onclick="return confirm('Yakin ingin menghapus admin ini?')">
@@ -159,13 +158,10 @@
                     </tbody>
                 </table>
             </div>
-
             <div class="mt-3">
                 {{ $admins->links() }}
             </div>
-
         </div>
     </div>
-
 </div>
 @endsection
