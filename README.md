@@ -136,6 +136,6 @@ Some things I'd like to improve or add:
 
 ## Developer
 
-**Kalingga Arundaya**
+**Kalingga Arundaya Priatna**
 
 GitHub: [@arundaya24](https://github.com/arundaya24)
